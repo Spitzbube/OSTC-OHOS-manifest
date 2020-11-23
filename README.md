@@ -8,6 +8,7 @@ This repository contains **repo** tool manifests for working with **meta-ohos**.
 
 To start working with **meta-ohos** issue following commands:
 
+    $ mkdir meta-ohos; cd meta-ohos
     $ repo init -u https://git.ostc-eu.org/incubate/yocto-ohos.git
     $ repo sync
     $ cd poky
