@@ -6,7 +6,12 @@ This repository contains **repo** tool manifests for working with **meta-ohos**.
 
 ## Getting started
 
-To start working with **meta-ohos** issue following commands:
+To start working with **meta-ohos** first install git repo:
+    $ sudo add-apt-repository ppa:zyga/oh-tools
+    $ sudo apt-get update
+    $ sudo apt-get install git-repo
+
+Once git repo has been installed we can use it to clone the necessary repositories:
 
     $ mkdir meta-ohos; cd meta-ohos
     $ repo init -u https://git.ostc-eu.org/incubate/yocto-ohos.git
