@@ -7,6 +7,7 @@ This repository contains **repo** tool manifests for working with **meta-ohos**.
 ## Getting started
 
 To start working with **meta-ohos** first install git repo:
+
     $ sudo add-apt-repository ppa:zyga/oh-tools
     $ sudo apt-get update
     $ sudo apt-get install git-repo
