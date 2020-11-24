@@ -20,7 +20,7 @@ Once git repo has been installed we can use it to clone the necessary repositori
     $ cd poky
     poky$ . oe-init-build-env
     # Working directory will automatically change to poky/build
-    poky/build$ DISTRO=poky-tiny MACHINE=qemux86 bitbake core-image-minimal
+    poky/build$ time DISTRO=poky-tiny MACHINE=qemux86 bitbake core-image-minimal
 
 When the build is finished, you can run the image by issuing:
 
