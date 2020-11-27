@@ -2,9 +2,10 @@
 <manifest>
 	<remote name="origin" fetch="https://git.ostc-eu.org/incubate/" />
 	<remote name="yocto" fetch="git://git.yoctoproject.org" />
+	<remote name="openembedded" fetch="git://git.openembedded.org" />
 
 	<default remote="origin" revision="master" sync-j="4" />
 	<project name="poky" remote="yocto"/>
-	<project name="meta-zephyr" remote="yocto"/>
-	<project name="meta-openembedded" remote="yocto"/>
+	<project name="meta-zephyr" remote="yocto" path="poky/meta-zephyr" />
+	<project name="meta-openembedded" remote="openembedded" path="poky/meta-openembedded" />
 </manifest>
