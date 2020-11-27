@@ -29,7 +29,15 @@ Layers for poky were added automatically by sourcing `oe-init-build-env`.
 
 Build distro of your choice:
 
+For Poky-tiny you can choose any of the following machines:
+qemux86, qemux86-64, qemuarm, qemuarmv5
+
     build$ DISTRO=poky-tiny MACHINE=qemux86 bitbake core-image-minimal
+
+
+For Zephyr you can choos any of the following machines:
+acrn, arduino-101-ble, arduino-101, arduino-101-sss, qemu-cortex-m3, qemu-nios2, qemu-x86
+
     build$ DISTRO=zephyr MACHINE=qemu-x86 bitbake zephyr-philosophers
 
 For Zephyr, `zephyr-philosophers` is the one of sample applications available
