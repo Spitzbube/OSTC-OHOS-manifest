@@ -75,20 +75,20 @@ After successful bootup, you should see following:
     # After login you should see prompt:
     root@qemux86:~#
 
-   # For FreeRTOS
-   ###### - FreeRTOS sample application -######
-   
-   A text may be entered using a keyboard.
-   It will be displayed when 'Enter' is pressed.
-   
-   Periodic task 10 secs
-   Waiting For Notification - Blocked...
-   Task1
-   Task1
-   You entered: "HelloFreeRTOS"
-   Unblocked
-   Notification Received
-   Waiting For Notification - Blocked...
+    # For FreeRTOS
+    ###### - FreeRTOS sample application -######
+    
+    A text may be entered using a keyboard.
+    It will be displayed when 'Enter' is pressed.
+    
+    Periodic task 10 secs
+    Waiting For Notification - Blocked...
+    Task1
+    Task1
+    You entered: "HelloFreeRTOS"
+    Unblocked
+    Notification Received
+    Waiting For Notification - Blocked...
 
 To exit qemu, you can either shut down the system:
 
