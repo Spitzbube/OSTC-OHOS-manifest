@@ -14,7 +14,7 @@ To start working with **meta-ohos** first install git repo:
 
 Once git repo has been installed we can use it to clone the necessary repositories:
 
-    $ mkdir meta-ohos; cd meta-ohos
+    $ mkdir ohos; cd ohos
     $ repo init -u https://git.ostc-eu.org/incubate/yocto-ohos.git
     $ repo sync
     $ cd poky
