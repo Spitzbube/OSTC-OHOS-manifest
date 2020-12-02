@@ -15,11 +15,11 @@
 # limitations under the License.
 stages:
   - compliance
+  - build
 
-reuse:
-  stage: compliance
-  image:
-    name: fsfe/reuse:latest
-    entrypoint: [""]
-  script:
-    - reuse lint
+include:
+  # TODO: switch to production pipelines when available.
+  - project: 'playground/pipelines'
+    file:
+      - '/reuse.yaml'
+      - '/repo+bitbake.yaml'
