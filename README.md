@@ -1,3 +1,8 @@
+<!--
+SPDX-FileCopyrightText: 2020 Huawei Inc.
+SPDX-License-Identifier: Apache-2.0
+-->
+
 meta-ohos
 ==========
 
