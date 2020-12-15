@@ -4,7 +4,7 @@ SPDX-FileCopyrightText: 2020 Huawei Inc.
 SPDX-License-Identifier: Apache-2.0
 -->
 <manifest>
-	<remote name="origin" fetch="ssh://git@git.ostc-eu.org/incubate/" />
+	<remote name="origin" fetch="https://git.ostc-eu.org/incubate/" />
 	<remote name="yocto" fetch="git://git.yoctoproject.org" />
 	<remote name="openembedded" fetch="git://git.openembedded.org" />
 	<remote name="aehs29" fetch="https://github.com/aehs29" />
