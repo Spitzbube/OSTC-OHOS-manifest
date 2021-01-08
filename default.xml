@@ -4,7 +4,7 @@ SPDX-FileCopyrightText: 2020 Huawei Inc.
 SPDX-License-Identifier: Apache-2.0
 -->
 <manifest>
-	<remote name="origin" fetch="https://git.ostc-eu.org/incubate/" />
+	<remote name="origin" fetch="https://git.ostc-eu.org/OSTC/" />
 	<remote name="yocto" fetch="git://git.yoctoproject.org" />
 	<remote name="openembedded" fetch="git://git.openembedded.org" />
 	<remote name="aehs29" fetch="https://github.com/aehs29" />
@@ -14,4 +14,6 @@ SPDX-License-Identifier: Apache-2.0
 	<project name="meta-zephyr" remote="origin" revision="staging" path="sources/meta-zephyr" />
 	<project name="meta-openembedded" remote="openembedded" revision="dunfell" path="sources/meta-openembedded" />
 	<project name="meta-freertos" remote="aehs29" path="sources/meta-freertos" />
+
+	<project name="meta-ohos" revision="develop" path="sources/meta-ohos" />
 </manifest>
