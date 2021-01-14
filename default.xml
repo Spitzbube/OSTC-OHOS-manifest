@@ -15,5 +15,5 @@ SPDX-License-Identifier: Apache-2.0
 	<project name="meta-openembedded" remote="openembedded" revision="f2d02cb71eaff8eb285a1997b30be52486c160ae" path="sources/meta-openembedded" />
 	<project name="meta-freertos" remote="aehs29" revision="0c643e6409c2eb045a82e58c221b7c2a4dae7d88" path="sources/meta-freertos" />
 
-	<project name="meta-ohos" revision="develop" path="sources/meta-ohos" />
+	<project name="meta-ohos" revision="refs/tags/v0.1.0" path="sources/meta-ohos" />
 </manifest>
