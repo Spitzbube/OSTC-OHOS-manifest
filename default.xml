@@ -8,12 +8,16 @@ SPDX-License-Identifier: Apache-2.0
 	<remote name="yocto" fetch="git://git.yoctoproject.org" />
 	<remote name="openembedded" fetch="git://git.openembedded.org" />
 	<remote name="aehs29" fetch="https://github.com/aehs29" />
+	<remote name="seco-intel" fetch="https://git.seco.com/pub/intel/yocto" />
 
 	<default remote="origin" revision="master" sync-j="4" />
 	<project name="poky" remote="yocto" revision="refs/tags/dunfell-23.0.4" path="sources/poky" />
 	<project name="meta-zephyr" remote="yocto" revision="bc8d845e3822713af128aa2d1640ea0ad795644b" path="sources/meta-zephyr" />
 	<project name="meta-openembedded" remote="openembedded" revision="f2d02cb71eaff8eb285a1997b30be52486c160ae" path="sources/meta-openembedded" />
 	<project name="meta-freertos" remote="aehs29" revision="0c643e6409c2eb045a82e58c221b7c2a4dae7d88" path="sources/meta-freertos" />
+
+	<project name="meta-intel" remote="yocto" revision="b4e5d33affeaa223459c0935a853485137b4591d" path="sources/meta-intel" />
+	<project name="meta-seco-intel" remote="seco-intel" revision="8ed34247cde49e12b28e39d8ae143444d18876c4" path="sources/meta-seco-intel" />
 
 	<project name="meta-ohos" revision="refs/tags/v0.1.0" path="sources/meta-ohos" />
 </manifest>
