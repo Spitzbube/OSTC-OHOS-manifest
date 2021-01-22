@@ -82,10 +82,8 @@ build-linux:
     # archives.
     - echo 'DL_DIR = "/var/shared/yocto/downloads"' >> build-ohos-linux-qemux86-64/conf/local.conf
     - echo 'SSTATE_DIR = "/var/shared/yocto/sstate-cache"' >> build-ohos-linux-qemux86-64/conf/local.conf
-    # Disable unreliable sanity checker. The checker tries to ping or resolve
-    # example.com and this ironically fails.
-    - touch build-ohos-linux-qemux86-64/conf/sanity.conf
-    - chown -R builder:root build-ohos-linux-qemux86-64/conf/sanity.conf
+    # Disable unreliable connectivity checker.
+    - echo 'CONNECTIVITY_CHECK_URIS = ""' >> build-ohos-linux-qemux86-64/conf/local.conf
     # Build the core-image-minimal as the non-root builder user. As described
     # above, bitbake doesn't like running as root.
     - sudo -H -u builder /bin/bash -c '. ./sources/poky/oe-init-build-env build-ohos-linux-qemux86-64 && bitbake core-image-minimal'
