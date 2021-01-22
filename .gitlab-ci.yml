@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
 #
-# Copyright 2020 Huawei Inc.
+# Copyright 2020-2021 Huawei Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,4 +22,74 @@ include:
   - project: 'playground/pipelines'
     file:
       - '/reuse.yaml'
-      - '/repo+bitbake.yaml'
+
+build-linux:
+  stage: build
+  # The pipeline relies on being scheduled to a gitlab worker with the
+  # following properties:
+  # - sufficient amount of disk space (~ 100GB will do).
+  # - non-ephemeral disk mounted at /var/shared with even more space (~500GB)
+  #   that is shared between runs of this pipeline. This is where the bitbake
+  #   download directory and sstate-cache are configured below.
+  # - additional CPU cores as the build process is very long.
+  tags: [large-disk]
+  image:
+    # This pipeline relies on a container with additional pre-installed software:
+    # - git and git-repo program for to process the manifest
+    # - all of the dependencies of bitbake (basic toolchain, python, many tools)
+    # Precise, machine readable description of this container can be found
+    # in https://git.ostc-eu.org/OSTC/containers/-/blob/master/ostc-dev/Dockerfile
+    name: registry.ostc-eu.org/ostc/containers/ostc-dev:latest
+  timeout: 3 hours
+  variables:
+    # Bitbake requires a non-C locale to operate.
+    LANG: en_US.UTF-8
+    LC_ALL: en_US.UTF-8
+  before_script:
+    # Bitbake requires a non-root user to operate.
+    # Create a "builder" user with the home directory set to the workspace
+    # path. This change might be useful to roll into the base ostc-dev
+    # container where a non-root user executes the entire script.
+    - useradd --shell /bin/bash --home-dir "$(pwd)" --uid 1774 --groups users --no-create-home builder
+    - mkdir -p /var/shared/yocto
+    - chown -v builder:root /var/shared/yocto
+  script:
+    # Switch from detached HEAD to a branch matching what the pipeline is
+    # running against. This is required by "repo init" below.
+    - git checkout -B "$CI_COMMIT_REF_NAME" "$CI_COMMIT_SHA"
+    # Initialize git-repo with the branch that is being processed by the pipeline.
+    - sh -c "repo init -u . -b \"$CI_BUILD_REF_NAME\""
+    # Synchronize the sources described by the manifest.
+    #
+    # TODO: https://git.ostc-eu.org/OSTC/OHOS/manifest/-/issues/7
+    # Mirror the repositories referenced here for an extra speed-up and then
+    # pass additional argument to git-repo, so that it uses the mirror as the
+    # backing store. The mirror must be available in the filesystem for this
+    # operation to work.
+    - sh -c 'repo sync'
+    # Chown everything we synchronized to the builder user. We need this for
+    # the actual build as bitbake doesn't like running as root.
+    - chown -R builder:root .
+    # Initialize bitbake build environment, this uses . (aka source, but source
+    # is a bashism), to load the oe-init-build-env into the running bash
+    # process and create the build directory structure under
+    # build-ohos-linux-qemu86-64.
+    - sudo -H -u builder /bin/bash -c 'TEMPLATECONF=../sources/meta-ohos/flavours/linux . ./sources/poky/oe-init-build-env build-ohos-linux-qemux86-64'
+    # Re-configure the created build directory to use our shared download cache
+    # and sstate-cache. Those are shared among all CI jobs running on our build
+    # cluster. This is what enables efficient builds and avoids (some) network
+    # problems that may be encountered when downloading third party source
+    # archives.
+    - echo 'DL_DIR = "/var/shared/yocto/downloads"' >> build-ohos-linux-qemux86-64/conf/local.conf
+    - echo 'SSTATE_DIR = "/var/shared/yocto/sstate-cache"' >> build-ohos-linux-qemux86-64/conf/local.conf
+    # Disable unreliable sanity checker. The checker tries to ping or resolve
+    # example.com and this ironically fails.
+    - touch build-ohos-linux-qemux86-64/conf/sanity.conf
+    - chown -R builder:root build-ohos-linux-qemux86-64/conf/sanity.conf
+    # Build the core-image-minimal as the non-root builder user. As described
+    # above, bitbake doesn't like running as root.
+    - sudo -H -u builder /bin/bash -c '. ./sources/poky/oe-init-build-env build-ohos-linux-qemux86-64 && bitbake core-image-minimal'
+  artifacts:
+    paths:
+      - build-ohos-linux-qemux86-64/tmp/deploy/images
+      - build-ohos-linux-qemux86-64/tmp/deploy/licenses

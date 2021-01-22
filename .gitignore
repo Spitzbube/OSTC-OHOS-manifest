@@ -1,0 +1,11 @@
+# SPDX-FileCopyrightText: 2021 Huawei Inc.
+# SPDX-License-Identifier: Apache-2.0
+
+# Build directories for specific targets
+build-*
+
+# Repo marker or real installation
+.repo
+
+# Sources checked out by git-repo
+sources
