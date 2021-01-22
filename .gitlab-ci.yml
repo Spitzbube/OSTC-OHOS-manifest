@@ -25,15 +25,31 @@ include:
 
 build-linux:
   stage: build
+  # The pipeline relies on being scheduled to a gitlab worker with the
+  # following properties:
+  # - sufficient amount of disk space (~ 100GB will do).
+  # - non-ephemeral disk mounted at /var/shared with even more space (~500GB)
+  #   that is shared between runs of this pipeline. This is where the bitbake
+  #   download directory and sstate-cache are configured below.
+  # - additional CPU cores as the build process is very long.
   tags: [large-disk]
   image:
+    # This pipeline relies on a container with additional pre-installed software:
+    # - git and git-repo program for to process the manifest
+    # - all of the dependencies of bitbake (basic toolchian, python, many tools)
+    # Precise, machine readable description of this container can be found
+    # in https://git.ostc-eu.org/OSTC/containers/-/blob/master/ostc-dev/Dockerfile
     name: registry.ostc-eu.org/ostc/containers/ostc-dev:latest
   timeout: 3 hours
   variables:
+    # Bitbake requires a non-C locale to operate.
     LANG: en_US.UTF-8
     LC_ALL: en_US.UTF-8
   before_script:
-    # TODO: roll the builder user into ostc-dev so that the container user is not root and the chowns go away.
+    # Bitbake requires a non-root user to operate.
+    # Create a "builder" user with the home directory set to the workspace
+    # path. This change might be useful to roll into the base ostc-dev
+    # container where a non-root user exectues the entire script.
     - useradd --shell /bin/bash --home-dir "$(pwd)" --uid 1774 --groups users --no-create-home builder
     - mkdir -p /var/shared/yocto
     - chown -v builder:root /var/shared/yocto
