@@ -36,7 +36,7 @@ build-linux:
   image:
     # This pipeline relies on a container with additional pre-installed software:
     # - git and git-repo program for to process the manifest
-    # - all of the dependencies of bitbake (basic toolchian, python, many tools)
+    # - all of the dependencies of bitbake (basic toolchain, python, many tools)
     # Precise, machine readable description of this container can be found
     # in https://git.ostc-eu.org/OSTC/containers/-/blob/master/ostc-dev/Dockerfile
     name: registry.ostc-eu.org/ostc/containers/ostc-dev:latest
@@ -49,7 +49,7 @@ build-linux:
     # Bitbake requires a non-root user to operate.
     # Create a "builder" user with the home directory set to the workspace
     # path. This change might be useful to roll into the base ostc-dev
-    # container where a non-root user exectues the entire script.
+    # container where a non-root user executes the entire script.
     - useradd --shell /bin/bash --home-dir "$(pwd)" --uid 1774 --groups users --no-create-home builder
     - mkdir -p /var/shared/yocto
     - chown -v builder:root /var/shared/yocto
@@ -57,7 +57,7 @@ build-linux:
     # Switch from detached HEAD to a branch matching what the pipeline is
     # running against. This is required by "repo init" below.
     - git checkout -B "$CI_COMMIT_REF_NAME" "$CI_COMMIT_SHA"
-    # Initialize git-repo with the brnach that is being processed by the pipeline.
+    # Initialize git-repo with the branch that is being processed by the pipeline.
     - sh -c "repo init -u . -b \"$CI_BUILD_REF_NAME\""
     # Synchronize the sources described by the manifest.
     #
@@ -82,7 +82,7 @@ build-linux:
     # archives.
     - echo 'DL_DIR = "/var/shared/yocto/downloads"' >> build-ohos-linux-qemux86-64/conf/local.conf
     - echo 'SSTATE_DIR = "/var/shared/yocto/sstate-cache"' >> build-ohos-linux-qemux86-64/conf/local.conf
-    # Disable unreliable stanity checker. The checker tries o ping or resolve
+    # Disable unreliable sanity checker. The checker tries to ping or resolve
     # example.com and this ironically fails.
     - touch build-ohos-linux-qemux86-64/conf/sanity.conf
     - chown -R builder:root build-ohos-linux-qemux86-64/conf/sanity.conf
