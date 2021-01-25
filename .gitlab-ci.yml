@@ -100,6 +100,16 @@ build-linux:
       - $OHOS_BUILD_DIR/tmp/deploy/images
       - $OHOS_BUILD_DIR/tmp/deploy/licenses
 
+build-linux-avenger96:
+  extends: .build
+  variables:
+    OHOS_BUILD_FLAVOUR: linux
+    OHOS_BUILD_DIR: build-ohos-linux-stm32mp1-av96
+    OHOS_BUILD_GOAL: core-image-base
+  script:
+    # Run the generic build script from the &build-script anchor above
+    - *build-script
+
 build-zephyr:
   extends: .build
   variables:
