@@ -23,7 +23,9 @@ include:
     file:
       - '/reuse.yaml'
 
-build-linux:
+.build:
+  # This is a pipeline job that is used via the "extends" mechanism below.
+  # For reference see https://docs.gitlab.com/ee/ci/yaml/README.html
   stage: build
   # The pipeline relies on being scheduled to a gitlab worker with the
   # following properties:
@@ -72,22 +74,50 @@ build-linux:
     - chown -R builder:root .
     # Initialize bitbake build environment, this uses . (aka source, but source
     # is a bashism), to load the oe-init-build-env into the running bash
-    # process and create the build directory structure under
-    # build-ohos-linux-qemu86-64.
-    - sudo -H -u builder /bin/bash -c 'TEMPLATECONF=../sources/meta-ohos/flavours/linux . ./sources/poky/oe-init-build-env build-ohos-linux-qemux86-64'
+    # process and create the build directory structure under $OHOS_BUILD_DIR.
+    - sudo -H -u builder /bin/bash -c "TEMPLATECONF=../sources/meta-ohos/flavours/\"$OHOS_BUILD_FLAVOUR\" . ./sources/poky/oe-init-build-env \"$OHOS_BUILD_DIR\""
     # Re-configure the created build directory to use our shared download cache
     # and sstate-cache. Those are shared among all CI jobs running on our build
     # cluster. This is what enables efficient builds and avoids (some) network
     # problems that may be encountered when downloading third party source
     # archives.
-    - echo 'DL_DIR = "/var/shared/yocto/downloads"' >> build-ohos-linux-qemux86-64/conf/local.conf
-    - echo 'SSTATE_DIR = "/var/shared/yocto/sstate-cache"' >> build-ohos-linux-qemux86-64/conf/local.conf
+    - echo 'DL_DIR = "/var/shared/yocto/downloads"' >> "$OHOS_BUILD_DIR"/conf/local.conf
+    - echo 'SSTATE_DIR = "/var/shared/yocto/sstate-cache"' >> "$OHOS_BUILD_DIR"/conf/local.conf
     # Disable unreliable connectivity checker.
-    - echo 'CONNECTIVITY_CHECK_URIS = ""' >> build-ohos-linux-qemux86-64/conf/local.conf
+    - echo 'CONNECTIVITY_CHECK_URIS = ""' >> "$OHOS_BUILD_DIR"/conf/local.conf
     # Build the core-image-minimal as the non-root builder user. As described
     # above, bitbake doesn't like running as root.
-    - sudo -H -u builder /bin/bash -c '. ./sources/poky/oe-init-build-env build-ohos-linux-qemux86-64 && bitbake core-image-minimal'
+    - sudo -H -u builder /bin/bash -c ". ./sources/poky/oe-init-build-env \"$OHOS_BUILD_DIR\" && bitbake \"$OHOS_BUILD_GOAL\""
+
+build-linux:
+  extends: .build
+  variables:
+    OHOS_BUILD_FLAVOUR: "linux"
+    OHOS_BUILD_DIR: "build-ohos-linux-qemux86-64"
+    OHOS_BUILD_GOAL: "core-image-minimal"
   artifacts:
     paths:
-      - build-ohos-linux-qemux86-64/tmp/deploy/images
-      - build-ohos-linux-qemux86-64/tmp/deploy/licenses
+      - $OHOS_BUILD_DIR/tmp/deploy/images
+      - $OHOS_BUILD_DIR/tmp/deploy/licenses
+
+build-zephyr:
+  extends: .build
+  variables:
+    OHOS_BUILD_FLAVOUR: zephyr
+    OHOS_BUILD_DIR: build-ohos-zephyr-qemu-x86
+    OHOS_BUILD_GOAL: zephyr-philosophers
+  artifacts:
+    paths:
+      - $OHOS_BUILD_DIR/tmp-newlib/deploy/images
+      - $OHOS_BUILD_DIR/tmp-newlib/deploy/licenses
+
+build-freertos:
+  extends: .build
+  variables:
+    OHOS_BUILD_FLAVOUR: freertos
+    OHOS_BUILD_DIR: build-ohos-freertos-qemuarmv5
+    OHOS_BUILD_GOAL: freertos-demo
+  artifacts:
+    paths:
+      - $OHOS_BUILD_DIR/tmp/deploy/images
+      - $OHOS_BUILD_DIR/tmp/deploy/licenses
