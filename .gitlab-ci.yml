@@ -55,7 +55,6 @@ include:
     - useradd --shell /bin/bash --home-dir "$(pwd)" --uid 1774 --groups users --no-create-home builder
     - mkdir -p /var/shared/yocto
     - chown -v builder:root /var/shared/yocto
-  script: &build-script
     # Switch from detached HEAD to a branch matching what the pipeline is
     # running against. This is required by "repo init" below.
     - git checkout -B "$CI_COMMIT_REF_NAME" "$CI_COMMIT_SHA"
@@ -85,6 +84,7 @@ include:
     - echo 'SSTATE_DIR = "/var/shared/yocto/sstate-cache"' >> "$OHOS_BUILD_DIR"/conf/local.conf
     # Disable unreliable connectivity checker.
     - echo 'CONNECTIVITY_CHECK_URIS = ""' >> "$OHOS_BUILD_DIR"/conf/local.conf
+  script: &build-script
     # Build the core-image-minimal as the non-root builder user. As described
     # above, bitbake doesn't like running as root.
     - sudo -H -u builder /bin/bash -c ". ./sources/poky/oe-init-build-env \"$OHOS_BUILD_DIR\" && bitbake \"$OHOS_BUILD_GOAL\""
