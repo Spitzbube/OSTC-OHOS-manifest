@@ -55,7 +55,7 @@ include:
     - useradd --shell /bin/bash --home-dir "$(pwd)" --uid 1774 --groups users --no-create-home builder
     - mkdir -p /var/shared/yocto
     - chown -v builder:root /var/shared/yocto
-  script:
+  script: &build-script
     # Switch from detached HEAD to a branch matching what the pipeline is
     # running against. This is required by "repo init" below.
     - git checkout -B "$CI_COMMIT_REF_NAME" "$CI_COMMIT_SHA"
@@ -106,10 +106,21 @@ build-zephyr:
     OHOS_BUILD_FLAVOUR: zephyr
     OHOS_BUILD_DIR: build-ohos-zephyr-qemu-x86
     OHOS_BUILD_GOAL: zephyr-philosophers
+  script:
+    # Run the generic build script from the &build-script anchor above
+    - *build-script
+    # Build and run all Zephyr tests as well.
+    # The results are collected into testresults.json
+    # TODO: expose those as GitLab test result data as described on
+    # https://docs.gitlab.com/ee/ci/pipelines/job_artifacts.html#artifactsreportsjunit
+    - echo 'INHERIT += "testimage"' >> "$OHOS_BUILD_DIR"/conf/local.conf
+    - sudo -H -u builder /bin/bash -c ". ./sources/poky/oe-init-build-env \"$OHOS_BUILD_DIR\" && bitbake zephyr-kernel-test-all"
+    - sudo -H -u builder /bin/bash -c ". ./sources/poky/oe-init-build-env \"$OHOS_BUILD_DIR\" && bitbake zephyr-kernel-test-all -c testimage"
   artifacts:
     paths:
       - $OHOS_BUILD_DIR/tmp-newlib/deploy/images
       - $OHOS_BUILD_DIR/tmp-newlib/deploy/licenses
+      - $OHOS_BUILD_DIR/tmp-newlib/log/oeqa/testresults.json
 
 build-freertos:
   extends: .build
