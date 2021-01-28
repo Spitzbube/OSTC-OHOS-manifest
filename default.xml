@@ -16,7 +16,7 @@ SPDX-License-Identifier: Apache-2.0
 	<project name="meta-zephyr" remote="yocto" revision="bc8d845e3822713af128aa2d1640ea0ad795644b" path="sources/meta-zephyr" />
 	<project name="meta-openembedded" remote="openembedded" revision="f2d02cb71eaff8eb285a1997b30be52486c160ae" path="sources/meta-openembedded" />
 	<project name="meta-freertos" remote="aehs29" revision="0c643e6409c2eb045a82e58c221b7c2a4dae7d88" path="sources/meta-freertos" />
-	<project name="meta-st-stm32mp" remote="stm" revision="a81038b7e7a31c10c474b0871aae2a99b1c88e72" path="sources/meta-st-stm32mp" />
+	<project name="meta-st-stm32mp" remote="stm" revision="e2b65200390890e10d0993bc64c4d126adf4f9e4" path="sources/meta-st-stm32mp" />
 	<project name="meta-st-stm32mp-addons" remote="stm" revision="639395f29356e1583d9980f8a7f289bf3efba88a" path="sources/meta-st-stm32mp-addons" />
 	<project name="meta-av96" remote="origin" revision="f144f2e3ceb259b9bdd6e3b6f64be29c6dfbbc69" path="sources/meta-av96" />
 
