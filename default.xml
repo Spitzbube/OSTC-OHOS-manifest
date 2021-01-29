@@ -23,5 +23,5 @@ SPDX-License-Identifier: Apache-2.0
 	<project name="meta-intel" remote="yocto" revision="b4e5d33affeaa223459c0935a853485137b4591d" path="sources/meta-intel" />
 	<project name="meta-seco-intel" remote="seco-intel" revision="8ed34247cde49e12b28e39d8ae143444d18876c4" path="sources/meta-seco-intel" />
 
-	<project name="meta-ohos" revision="44f3e690fdf1a5f202ff06789a60899704e3d964" path="sources/meta-ohos" />
+	<project name="meta-ohos" revision="8160436fd810aacbe46590adb1abd5a880d20552" path="sources/meta-ohos" />
 </manifest>
