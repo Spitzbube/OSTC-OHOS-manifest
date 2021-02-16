@@ -9,6 +9,7 @@ SPDX-License-Identifier: Apache-2.0
 	<remote name="openembedded" fetch="git://git.openembedded.org" />
 	<remote name="aehs29" fetch="https://github.com/aehs29" />
 	<remote name="seco-intel" fetch="https://git.seco.com/pub/intel/yocto" />
+	<remote name="seco-imx" fetch="https://git.seco.com/pub/i.mx/yocto/5.x" />
 	<remote name="stm" fetch="https://github.com/STMicroelectronics" />
 
 	<default remote="ohos" revision="develop" sync-j="4" />
@@ -22,6 +23,9 @@ SPDX-License-Identifier: Apache-2.0
 
 	<project name="meta-intel" remote="yocto" revision="b4e5d33affeaa223459c0935a853485137b4591d" path="sources/meta-intel" />
 	<project name="meta-seco-intel" remote="seco-intel" revision="d930faaf0befcf8fda49ba8fb149c44d90f1dea4" path="sources/meta-seco-intel" />
+
+	<project name="meta-freescale" remote="yocto" revision="11170950b155168ec414bbde48e3a4427fcac4bd" path="sources/meta-freescale" />
+	<project name="meta-seco-imx" remote="seco-imx" revision="c1cd8a485eb5888dc14e2f4e7d399d415f1ba8bb" path="sources/meta-seco-imx" />
 
 	<project name="meta-ohos" revision="8160436fd810aacbe46590adb1abd5a880d20552" path="sources/meta-ohos" />
 </manifest>
