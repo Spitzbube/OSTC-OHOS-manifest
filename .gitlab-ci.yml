@@ -18,10 +18,11 @@ stages:
   - build
 
 include:
-  # TODO: switch to production pipelines when available.
-  - project: 'playground/pipelines'
-    file:
-      - '/reuse.yaml'
+ - project: 'OSTC/infrastructure/pipelines'
+   file: 'reuse.yaml'
+
+reuse:
+  extends: .reuse
 
 .build:
   # This is a pipeline job that is used via the "extends" mechanism below.
