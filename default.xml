@@ -11,6 +11,7 @@ SPDX-License-Identifier: Apache-2.0
 	<remote name="seco-intel" fetch="https://git.seco.com/pub/intel/yocto" />
 	<remote name="seco-imx" fetch="https://git.seco.com/pub/i.mx/yocto/5.x" />
 	<remote name="stm" fetch="https://github.com/STMicroelectronics" />
+	<remote name="qt5" fetch="https://github.com/meta-qt5" />
 
 	<default remote="ohos" revision="develop" sync-j="4" />
 	<project name="poky" remote="yocto" revision="refs/tags/dunfell-23.0.4" path="sources/poky" />
@@ -19,7 +20,9 @@ SPDX-License-Identifier: Apache-2.0
 	<project name="meta-freertos" remote="aehs29" revision="0c643e6409c2eb045a82e58c221b7c2a4dae7d88" path="sources/meta-freertos" />
 	<project name="meta-st-stm32mp" remote="stm" revision="e2b65200390890e10d0993bc64c4d126adf4f9e4" path="sources/meta-st-stm32mp" />
 	<project name="meta-st-stm32mp-addons" remote="stm" revision="639395f29356e1583d9980f8a7f289bf3efba88a" path="sources/meta-st-stm32mp-addons" />
-	<project name="meta-av96" remote="ohos" revision="f144f2e3ceb259b9bdd6e3b6f64be29c6dfbbc69" path="sources/meta-av96" />
+
+	<project name="meta-qt5" remote="qt5" revision="0d8eb956015acdea7e77cd6672d08dce18061510" path="sources/meta-qt5" />
+	<project name="meta-av96" remote="ohos" revision="9d2299c17cdcafc34e06c419ae756f730ab57c5e" path="sources/meta-av96" />
 
 	<project name="meta-intel" remote="yocto" revision="b4e5d33affeaa223459c0935a853485137b4591d" path="sources/meta-intel" />
 	<project name="meta-seco-intel" remote="seco-intel" revision="d930faaf0befcf8fda49ba8fb149c44d90f1dea4" path="sources/meta-seco-intel" />
