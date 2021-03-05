@@ -31,4 +31,5 @@ SPDX-License-Identifier: Apache-2.0
 	<project name="meta-seco-imx" remote="seco-imx" revision="c1cd8a485eb5888dc14e2f4e7d399d415f1ba8bb" path="sources/meta-seco-imx" />
 
 	<project name="meta-ohos" path="sources/meta-ohos" />
+	<project name="meta-python-dunfellplus" path="sources/meta-python-dunfellplus" />
 </manifest>
