@@ -4,6 +4,7 @@ SPDX-FileCopyrightText: 2021 Huawei Inc.
 SPDX-License-Identifier: Apache-2.0
 -->
 <manifest>
+	<remote name="github" fetch="https://github.com" />
 	<remote name="ohos" fetch="https://git.ostc-eu.org/OSTC/OHOS" />
 	<remote name="yocto" fetch="git://git.yoctoproject.org" />
 	<remote name="openembedded" fetch="git://git.openembedded.org" />
@@ -16,6 +17,7 @@ SPDX-License-Identifier: Apache-2.0
 	<project name="poky" remote="yocto" revision="9ee329c18fbe0c42eaf3d43657ea30591f79143b" path="sources/poky" />
 	<project name="meta-zephyr" path="sources/meta-zephyr" />
 	<project name="meta-openembedded" revision="6fd6cd72e236303fba94273f2a94a2c11c59d71e" path="sources/meta-openembedded" />
+	<project name="meta-homeassistant/meta-homeassistant.git" remote="github" revision="aba27258c70ca70b0e123e9b646b347bfcb9a1a5" path="sources/meta-homeassistant" />
 	<project name="meta-freertos" remote="aehs29" revision="0c643e6409c2eb045a82e58c221b7c2a4dae7d88" path="sources/meta-freertos" />
 	<project name="meta-st-stm32mp" remote="stm" revision="c1f0ba5c5b33417498521780b89cef024478cc7e" path="sources/meta-st-stm32mp" />
 	<project name="meta-st-stm32mp-addons" remote="stm" revision="639395f29356e1583d9980f8a7f289bf3efba88a" path="sources/meta-st-stm32mp-addons" />
