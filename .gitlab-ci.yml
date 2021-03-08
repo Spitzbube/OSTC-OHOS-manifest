@@ -13,134 +13,228 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 stages:
   - compliance
-  - test
   - build
+  - test
 
 include:
  - project: 'OSTC/infrastructure/pipelines'
-   file: 'reuse.yaml'
+   file:
+    - 'dco.yaml'
+    - 'reuse.yaml'
+    - 'workspace.yaml'
+
+dco:
+  extends: .dco
 
 reuse:
   extends: .reuse
 
 .build:
-  # This is a pipeline job that is used via the "extends" mechanism below.
-  # For reference see https://docs.gitlab.com/ee/ci/yaml/README.html
+  # Extend the workspace job. This effectively gives us an assembled tree and
+  # initialized bitbake. Some essential variables are defined in later jobs,
+  # like .build-linux, which sets OHOS_BUILD_FLAVOUR, which is inherited from
+  # the .workspace job.
+  extends: .workspace
   stage: build
-  # The pipeline relies on being scheduled to a gitlab worker with the
-  # following properties:
-  # - sufficient amount of disk space (~ 100GB will do).
-  # - non-ephemeral disk mounted at /var/shared with even more space (~500GB)
-  #   that is shared between runs of this pipeline. This is where the bitbake
-  #   download directory and sstate-cache are configured below.
-  # - additional CPU cores as the build process is very long.
-  tags: [large-disk]
-  image:
-    # This pipeline relies on a container with additional pre-installed software:
-    # - git and git-repo program for to process the manifest
-    # - all of the dependencies of bitbake (basic toolchain, python, many tools)
-    # Precise, machine readable description of this container can be found
-    # in https://git.ostc-eu.org/OSTC/containers/-/blob/master/ostc-dev/Dockerfile
-    name: registry.ostc-eu.org/ostc/containers/ostc-dev:latest
+  # Conservative timeout in case the build machine is busy and the cache is cold.
   timeout: 3 hours
   variables:
-    # Bitbake requires a non-C locale to operate.
-    LANG: en_US.UTF-8
-    LC_ALL: en_US.UTF-8
+    # When building, use the manifest repository from the branch being proposed.
+    # This setting is only valid in the manifest repository.
+    OHOS_MANIFEST_BRANCH: "$CI_COMMIT_REF_NAME"
+    # Name of the bitbake recipe to build. This must be set by specific jobs
+    # which extend the .build job template.
+    OHOS_RECIPE_NAME: ""
+    # Set to non-empty value to accept Freescale EULA.
+    OHOS_ACCEPT_FSL_EULA: ""
   before_script:
-    # Bitbake requires a non-root user to operate.
-    # Create a "builder" user with the home directory set to the workspace
-    # path. This change might be useful to roll into the base ostc-dev
-    # container where a non-root user executes the entire script.
-    - useradd --shell /bin/bash --home-dir "$(pwd)" --uid 1774 --groups users --no-create-home builder
-    - mkdir -p /var/shared/yocto
-    - chown -v builder:root /var/shared/yocto
-    # Switch from detached HEAD to a branch matching what the pipeline is
-    # running against. This is required by "repo init" below.
-    - git checkout -B "$CI_COMMIT_REF_NAME" "$CI_COMMIT_SHA"
-    # Initialize git-repo with the branch that is being processed by the pipeline.
-    - sh -c "repo init -u . -b \"$CI_BUILD_REF_NAME\""
-    # Synchronize the sources described by the manifest.
-    #
-    # TODO: https://git.ostc-eu.org/OSTC/OHOS/manifest/-/issues/7
-    # Mirror the repositories referenced here for an extra speed-up and then
-    # pass additional argument to git-repo, so that it uses the mirror as the
-    # backing store. The mirror must be available in the filesystem for this
-    # operation to work.
-    - sh -c 'repo sync'
-    # Chown everything we synchronized to the builder user. We need this for
-    # the actual build as bitbake doesn't like running as root.
-    - chown -R builder:root .
-    # Initialize bitbake build environment, this uses . (aka source, but source
-    # is a bashism), to load the oe-init-build-env into the running bash
-    # process and create the build directory structure under $OHOS_BUILD_DIR.
-    - sudo -H -u builder /bin/bash -c "TEMPLATECONF=../sources/meta-ohos/flavours/\"$OHOS_BUILD_FLAVOUR\" . ./sources/poky/oe-init-build-env \"$OHOS_BUILD_DIR\""
-    # Re-configure the created build directory to use our shared download cache
-    # and sstate-cache. Those are shared among all CI jobs running on our build
-    # cluster. This is what enables efficient builds and avoids (some) network
-    # problems that may be encountered when downloading third party source
-    # archives.
-    - echo 'DL_DIR = "/var/shared/yocto/downloads"' >> "$OHOS_BUILD_DIR"/conf/local.conf
-    - echo 'SSTATE_DIR = "/var/shared/yocto/sstate-cache"' >> "$OHOS_BUILD_DIR"/conf/local.conf
-    # Disable unreliable connectivity checker.
-    - echo 'CONNECTIVITY_CHECK_URIS = ""' >> "$OHOS_BUILD_DIR"/conf/local.conf
-  script: &build-script
-    # Build the core-image-minimal as the non-root builder user. As described
-    # above, bitbake doesn't like running as root.
-    - sudo -H -u builder /bin/bash -c ". ./sources/poky/oe-init-build-env \"$OHOS_BUILD_DIR\" && bitbake \"$OHOS_BUILD_GOAL\""
-
-build-linux:
-  extends: .build
-  variables:
-    OHOS_BUILD_FLAVOUR: "linux"
-    OHOS_BUILD_DIR: "build-ohos-linux-qemux86-64"
-    OHOS_BUILD_GOAL: "core-image-minimal"
+    # Check if the job is configured properly.
+    - test -n "$OHOS_RECIPE_NAME" || (
+        echo "precondition failed - set OHOS_RECIPE_NAME to the name of the recipe to build"
+        && exit 1 )
+    - !reference [.workspace, before_script]
+  script:
+    - !reference [.workspace, script]
+    # Accept Freescale EULA if required.
+    - if [ -n "$OHOS_ACCEPT_FSL_EULA" ]; then
+         echo 'ACCEPT_FSL_EULA = "1"' >> conf/local.conf;
+      fi
+    # Build the desired recipe.
+    - time bitbake "$OHOS_RECIPE_NAME"
+    # Move artifacts for recovery, which only considers $CI_PROJECT_DIR and
+    # subdirectories.
+    - mkdir -p "$CI_PROJECT_DIR"/artifacts
+    - mv tmp/deploy/images/ "$CI_PROJECT_DIR"/artifacts || true
+    - mv tmp/deploy/licenses/ "$CI_PROJECT_DIR"/artifacts || true
+    # TODO: copy all build logs as well.
   artifacts:
     paths:
-      - $OHOS_BUILD_DIR/tmp/deploy/images
-      - $OHOS_BUILD_DIR/tmp/deploy/licenses
+      - artifacts/
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH
+      changes:
+        # Run the build only when the respective manifest changes
+        - $OHOS_MANIFEST_NAME
+        # Or when the pipeline definition changes.
+        - .gitlab-ci.yml
 
-build-linux-avenger96:
+##
+## Templates build jobs for each OpenHarmony flavor.
+##
+
+.build-linux:
   extends: .build
   variables:
     OHOS_BUILD_FLAVOUR: linux
-    OHOS_BUILD_DIR: build-ohos-linux-stm32mp1-av96
-    OHOS_BUILD_GOAL: core-image-base
-  script:
-    # Run the generic build script from the &build-script anchor above
-    - *build-script
+    OHOS_RECIPE_NAME: openharmony-image-base-tests
 
-build-zephyr:
+.build-zephyr:
   extends: .build
   variables:
     OHOS_BUILD_FLAVOUR: zephyr
-    OHOS_BUILD_DIR: build-ohos-zephyr-qemu-x86
-    OHOS_BUILD_GOAL: zephyr-philosophers
-  script:
-    # Run the generic build script from the &build-script anchor above
-    - *build-script
-    # Build and run all Zephyr tests as well.
-    # The results are collected into testresults.json
-    # TODO: expose those as GitLab test result data as described on
-    # https://docs.gitlab.com/ee/ci/pipelines/job_artifacts.html#artifactsreportsjunit
-    - echo 'INHERIT += "testimage"' >> "$OHOS_BUILD_DIR"/conf/local.conf
-    - sudo -H -u builder /bin/bash -c ". ./sources/poky/oe-init-build-env \"$OHOS_BUILD_DIR\" && bitbake zephyr-kernel-test-all"
-    - sudo -H -u builder /bin/bash -c ". ./sources/poky/oe-init-build-env \"$OHOS_BUILD_DIR\" && bitbake zephyr-kernel-test-all -c testimage"
-  artifacts:
-    paths:
-      - $OHOS_BUILD_DIR/tmp-newlib/deploy/images
-      - $OHOS_BUILD_DIR/tmp-newlib/deploy/licenses
-      - $OHOS_BUILD_DIR/tmp-newlib/log/oeqa/testresults.json
+    OHOS_RECIPE_NAME: zephyr-philosophers
 
-build-freertos:
+.build-freertos:
   extends: .build
   variables:
     OHOS_BUILD_FLAVOUR: freertos
-    OHOS_BUILD_DIR: build-ohos-freertos-qemuarmv5
-    OHOS_BUILD_GOAL: freertos-demo
-  artifacts:
-    paths:
-      - $OHOS_BUILD_DIR/tmp/deploy/images
-      - $OHOS_BUILD_DIR/tmp/deploy/licenses
+    OHOS_RECIPE_NAME: freertos-demo
+
+##
+## Template build jobs for default.xml
+##
+## This manifest is "stable" and uses pinned git hashes of all the repositories
+## it includes.
+##
+
+.build-default-linux:
+  extends: .build-linux
+  variables:
+    OHOS_MANIFEST_NAME: default.xml
+
+.build-default-zephyr:
+  extends: .build-zephyr
+  variables:
+    OHOS_MANIFEST_NAME: default.xml
+
+.build-default-freertos:
+  extends: .build-freertos
+  variables:
+    OHOS_MANIFEST_NAME: default.xml
+
+##
+## Build jobs for default.xml
+##
+
+default-linux-qemu-x86_64:
+  extends: .build-default-linux
+  variables:
+    MACHINE: qemux86-64
+
+default-linux-seco-intel-b68:
+  extends: .build-default-linux
+  variables:
+    MACHINE: seco-intel-b68
+
+default-linux-seco-imx8mm-c61:
+  extends: .build-default-linux
+  variables:
+    MACHINE: seco-imx8mm-c61
+    # This platform requires proprietary resources to boot.
+    OHOS_ACCEPT_FSL_EULA: 1
+
+default-linux-stm32mp1-av96:
+  extends: .build-default-linux
+  variables:
+    MACHINE: stm32mp1-av96
+
+default-zephyr-qemu-x86:
+  extends: .build-default-zephyr
+  variables:
+    MACHINE: qemu-x86
+
+default-zephyr-96b-nitrogen:
+  extends: .build-default-zephyr
+  variables:
+    MACHINE: 96b-nitrogen
+
+default-zephyr-96b-avenger:
+  extends: .build-default-zephyr
+  variables:
+    MACHINE: 96b-avenger96
+
+default-freertos-armv5:
+  extends: .build-default-freertos
+  variables:
+    MACHINE: qemuarmv5
+
+##
+## Template build jobs for develop.xml
+##
+## This manifest is "floating" and follows default branches of OSTC-specific repositories
+## it includes.
+##
+
+.build-develop-linux:
+  extends: .build-linux
+  variables:
+    OHOS_MANIFEST_NAME: develop.xml
+
+.build-develop-zephyr:
+  extends: .build-zephyr
+  variables:
+    OHOS_MANIFEST_NAME: develop.xml
+
+.build-develop-freertos:
+  extends: .build-freertos
+  variables:
+    OHOS_MANIFEST_NAME: develop.xml
+
+##
+## Build jobs for develop.xml
+##
+
+develop-linux-qemu-x86_64:
+  extends: .build-develop-linux
+  variables:
+    MACHINE: qemux86-64
+
+develop-linux-seco-intel-b68:
+  extends: .build-develop-linux
+  variables:
+    MACHINE: seco-intel-b68
+
+develop-linux-seco-imx8mm-c61:
+  extends: .build-develop-linux
+  variables:
+    MACHINE: seco-imx8mm-c61
+    # This platform requires proprietary resources to boot.
+    OHOS_ACCEPT_FSL_EULA: 1
+
+develop-linux-stm32mp1-av96:
+  extends: .build-develop-linux
+  variables:
+    MACHINE: stm32mp1-av96
+
+develop-zephyr-qemu-x86:
+  extends: .build-develop-zephyr
+  variables:
+    MACHINE: qemu-x86
+
+develop-zephyr-96b-nitrogen:
+  extends: .build-develop-zephyr
+  variables:
+    MACHINE: 96b-nitrogen
+
+develop-zephyr-96b-avenger:
+  extends: .build-develop-zephyr
+  variables:
+    MACHINE: 96b-avenger96
+
+develop-freertos-armv5:
+  extends: .build-develop-freertos
+  variables:
+    MACHINE: qemuarmv5
