@@ -1,0 +1,89 @@
+# SPDX-License-Identifier: Apache-2.0
+#
+# Copyright 2020-2021 Huawei Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# This file depends on:
+#   .ostc-ci/build-flavours.yaml
+# from the git repository:
+#   https://git.ostc-eu.org/OSTC/OHOS/manifest.git
+
+##
+## Template build jobs for default.xml
+##
+## This manifest is "stable" and uses pinned git hashes of all the repositories
+## it includes.
+##
+
+.build-default-linux:
+  extends: .build-linux
+  variables:
+    OHOS_MANIFEST_NAME: default.xml
+
+.build-default-zephyr:
+  extends: .build-zephyr
+  variables:
+    OHOS_MANIFEST_NAME: default.xml
+
+.build-default-freertos:
+  extends: .build-freertos
+  variables:
+    OHOS_MANIFEST_NAME: default.xml
+
+##
+## Build jobs for default.xml
+##
+
+default-linux-qemu-x86_64:
+  extends: .build-default-linux
+  variables:
+    MACHINE: qemux86-64
+
+default-linux-seco-intel-b68:
+  extends: .build-default-linux
+  variables:
+    MACHINE: seco-intel-b68
+
+default-linux-seco-imx8mm-c61:
+  extends: .build-default-linux
+  variables:
+    MACHINE: seco-imx8mm-c61
+    # This platform requires proprietary resources to boot.
+    OHOS_ACCEPT_FSL_EULA: 1
+
+default-linux-stm32mp1-av96:
+  extends: .build-default-linux
+  variables:
+    MACHINE: stm32mp1-av96
+
+default-zephyr-qemu-x86:
+  extends: .build-default-zephyr
+  variables:
+    MACHINE: qemu-x86
+
+default-zephyr-96b-nitrogen:
+  extends: .build-default-zephyr
+  variables:
+    MACHINE: 96b-nitrogen
+
+default-zephyr-96b-avenger:
+  extends: .build-default-zephyr
+  variables:
+    MACHINE: 96b-avenger96
+
+default-freertos-armv5:
+  extends: .build-default-freertos
+  variables:
+    MACHINE: qemuarmv5
+
