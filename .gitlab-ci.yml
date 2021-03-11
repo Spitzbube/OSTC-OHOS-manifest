@@ -67,8 +67,12 @@ reuse:
     # Move artifacts for recovery, which only considers $CI_PROJECT_DIR and
     # subdirectories.
     - mkdir -p "$CI_PROJECT_DIR"/artifacts
-    - mv tmp/deploy/images/ "$CI_PROJECT_DIR"/artifacts || true
-    - mv tmp/deploy/licenses/ "$CI_PROJECT_DIR"/artifacts || true
+    # The name of the build-specific tmp directory may vary. Ask bitbake
+    # instead of hard-coding it. This is currently only relevant for Zephyr,
+    # which uses tmp-newlib.
+    - eval "$(bitbake -e | grep ^TMPDIR= | sed -e 's/^TMPDIR/BITBAKE_TMPDIR/g')"
+    - mv "$BITBAKE_TMPDIR"/deploy/images/ "$CI_PROJECT_DIR"/artifacts || true
+    - mv "$BITBAKE_TMPDIR"/deploy/licenses/ "$CI_PROJECT_DIR"/artifacts || true
     # TODO: copy all build logs as well.
   artifacts:
     paths:
