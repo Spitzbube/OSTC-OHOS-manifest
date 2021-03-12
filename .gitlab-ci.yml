@@ -27,6 +27,8 @@ include:
     - 'reuse.yaml'
     # Include the shared workspace job used as the foundation of our .build job.
     - 'workspace.yaml'
+ # Include the generic .build job.
+ - local: '/.ostc-ci/build-generic.yaml'
  # Include the set of build flavours.
  - local: '/.ostc-ci/build-flavours.yaml'
  # Include the set of templates and jobs that use default.xml
@@ -40,58 +42,20 @@ dco:
 reuse:
   extends: .reuse
 
+# Customize the generic .build job, included from build-generic.yaml above,
+# with an unique set of rules that enable the job and an override for the
+# OHOS_MANIFEST_BRANCH variable.
 .build:
-  # Extend the workspace job. This effectively gives us an assembled tree and
-  # initialized bitbake. Some essential variables are defined in later jobs,
-  # like .build-linux, which sets OHOS_BUILD_FLAVOUR, which is inherited from
-  # the .workspace job.
-  extends: .workspace
-  stage: build
-  # Conservative timeout in case the build machine is busy and the cache is cold.
-  timeout: 3 hours
   variables:
     # When building, use the manifest repository from the branch being proposed.
     # This setting is only valid in the manifest repository.
     OHOS_MANIFEST_BRANCH: "$CI_COMMIT_REF_NAME"
-    # Name of the bitbake recipe to build. This must be set by specific jobs
-    # which extend the .build job template.
-    OHOS_RECIPE_NAME: ""
-    # Set to non-empty value to accept Freescale EULA.
-    OHOS_ACCEPT_FSL_EULA: ""
-  before_script:
-    # Check if the job is configured properly.
-    - test -n "$OHOS_RECIPE_NAME" || (
-        echo "precondition failed - set OHOS_RECIPE_NAME to the name of the recipe to build"
-        && exit 1 )
-    - !reference [.workspace, before_script]
-  script:
-    - !reference [.workspace, script]
-    # Accept Freescale EULA if required.
-    - if [ -n "$OHOS_ACCEPT_FSL_EULA" ]; then
-         echo 'ACCEPT_FSL_EULA = "1"' >> conf/local.conf;
-      fi
-    # Non-tainted builds generate complete mirrors.
-    - if [ -z "${OHOS_TAINTED_BUILD:-}" ]; then echo 'BB_GENERATE_MIRROR_TARBALLS = "1"' >> conf/local.conf; fi
-    # Build the desired recipe.
-    - time bitbake "$OHOS_RECIPE_NAME"
-    # Move artifacts for recovery, which only considers $CI_PROJECT_DIR and
-    # subdirectories.
-    - mkdir -p "$CI_PROJECT_DIR"/artifacts
-    # The name of the build-specific tmp directory may vary. Ask bitbake
-    # instead of hard-coding it. This is currently only relevant for Zephyr,
-    # which uses tmp-newlib.
-    - eval "$(bitbake -e | grep ^TMPDIR= | sed -e 's/^TMPDIR/BITBAKE_TMPDIR/g')"
-    - mv "$BITBAKE_TMPDIR"/deploy/images/ "$CI_PROJECT_DIR"/artifacts || true
-    - mv "$BITBAKE_TMPDIR"/deploy/licenses/ "$CI_PROJECT_DIR"/artifacts || true
-    # TODO: copy all build logs as well.
-  artifacts:
-    paths:
-      - artifacts/
   rules:
-    - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH
+    # Run the build when a merge request is created and the corresponding
+    # manifest is modified. Or when the pipeline definition, or its components,
+    # are changed.
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
       changes:
-        # Run the build only when the respective manifest changes
         - $OHOS_MANIFEST_NAME
-        # Or when the pipeline definition, or its components, change.
         - .gitlab-ci.yml
         - .ostc-ci/*.yaml
