@@ -49,6 +49,8 @@ default-linux-qemu-x86_64:
   extends: .build-default-linux
   variables:
     MACHINE: qemux86-64
+    # See the note on develop-linux-qemu-x86_64.
+    OHOS_TAINTED_BUILD: ""
 
 default-linux-seco-intel-b68:
   extends: .build-default-linux
@@ -71,6 +73,8 @@ default-zephyr-qemu-x86:
   extends: .build-default-zephyr
   variables:
     MACHINE: qemu-x86
+    # See the note on develop-linux-qemu-x86_64.
+    OHOS_TAINTED_BUILD: ""
 
 default-zephyr-96b-nitrogen:
   extends: .build-default-zephyr
@@ -86,4 +90,5 @@ default-freertos-armv5:
   extends: .build-default-freertos
   variables:
     MACHINE: qemuarmv5
-
+    # See the note on develop-linux-qemu-x86_64.
+    OHOS_TAINTED_BUILD: ""

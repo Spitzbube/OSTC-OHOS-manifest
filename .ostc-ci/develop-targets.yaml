@@ -49,6 +49,15 @@ develop-linux-qemu-x86_64:
   extends: .build-develop-linux
   variables:
     MACHINE: qemux86-64
+    # Set OHOS_TAINTED_BUILD to an empty string, overriding the value defined in
+    # the .workspace job, which is ultimately referenced by the .build job
+    # referenced from the .build-develop-linux job.
+    #
+    # This is done assuming that there are no non-redistributable or otherwise
+    # tainted build intermediate files, downloads or published artifacts. All
+    # the non-tainted builds help to populate a cache exposed at
+    # https://cache.ostc-eu.org/bitbake
+    OHOS_TAINTED_BUILD: ""
 
 develop-linux-seco-intel-b68:
   extends: .build-develop-linux
@@ -71,6 +80,8 @@ develop-zephyr-qemu-x86:
   extends: .build-develop-zephyr
   variables:
     MACHINE: qemu-x86
+    # See the note on develop-linux-qemu-x86_64.
+    OHOS_TAINTED_BUILD: ""
 
 develop-zephyr-96b-nitrogen:
   extends: .build-develop-zephyr
@@ -86,3 +97,5 @@ develop-freertos-armv5:
   extends: .build-develop-freertos
   variables:
     MACHINE: qemuarmv5
+    # See the note on develop-linux-qemu-x86_64.
+    OHOS_TAINTED_BUILD: ""
