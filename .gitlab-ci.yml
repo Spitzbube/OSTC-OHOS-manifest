@@ -48,3 +48,14 @@ reuse:
     # Disable collection of image artifacts. They are not used here and they
     # are expensive to upload and store.
     paths: []
+
+# Perform scheduled builds with glibc instead of musl.
+develop-linux-glibc-qemu-x86_64:
+  extends: develop-linux-qemu-x86_64
+  variables:
+    # This appends TCLIBC = "glibc" to conf/local.conf and interacts with
+    # meta-ohos-core layer.
+    # https://git.ostc-eu.org/OSTC/OHOS/meta-ohos/-/blob/develop/meta-ohos-core/conf/distro/openharmony-linux.conf#L11
+    OHOS_BB_LOCAL_CONF_TCLIBC: glibc
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
