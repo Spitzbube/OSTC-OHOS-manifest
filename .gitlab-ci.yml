@@ -70,6 +70,8 @@ reuse:
     - if [ -n "$OHOS_ACCEPT_FSL_EULA" ]; then
          echo 'ACCEPT_FSL_EULA = "1"' >> conf/local.conf;
       fi
+    # Non-tainted builds generate complete mirrors.
+    - if [ -z "${OHOS_TAINTED_BUILD:-}" ]; then echo 'BB_GENERATE_MIRROR_TARBALLS = "1"' >> conf/local.conf; fi
     # Build the desired recipe.
     - time bitbake "$OHOS_RECIPE_NAME"
     # Move artifacts for recovery, which only considers $CI_PROJECT_DIR and
