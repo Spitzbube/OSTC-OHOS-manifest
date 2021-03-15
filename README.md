@@ -1,6 +1,6 @@
 <!--
-SPDX-FileCopyrightText: 2020 Huawei Inc.
 SPDX-License-Identifier: Apache-2.0
+SPDX-FileCopyrightText: Huawei Inc.
 -->
 
 meta-ohos manifest

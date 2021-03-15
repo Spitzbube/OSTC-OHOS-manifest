@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-SPDX-FileCopyrightText: 2020 Huawei Inc.
 SPDX-License-Identifier: Apache-2.0
+SPDX-FileCopyrightText: Huawei Inc.
 -->
 <manifest>
 	<remote name="ohos" fetch="https://git.ostc-eu.org/OSTC/OHOS" />
