@@ -159,6 +159,19 @@
     # devtool and other related tools.
     # xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
+    # Generic local.conf customization point. All environment variables with a
+    # given prefix are converted to local.conf variables, with the prefix
+    # dropped. Some extra sed processing is used to quote the variables.
+    # Everything runs in a sub-shell with bash pipefail disabled, as otherwise
+    # lack of variables matching the grep pattern causes the execution to stop.
+    - |
+      ( set +o pipefail;
+        env \
+          | grep -E '^OHOS_BB_LOCAL_CONF_[A-Z_0-9]+=' \
+          | sed -e 's/^OHOS_BB_LOCAL_CONF_//g' -e 's/"/\\"/g' -e 's/=/ = "/g' -e 's/$/"/g' \
+          | sort \
+          | tee -a conf/local.conf )
+
     # Point to https://example.net instead of the default https://example.com.
     # The OSTC cloud provider has misconfigured DNS which resolves the latter
     # incorrectly.
