@@ -44,3 +44,7 @@ reuse:
         - $OHOS_MANIFEST_NAME
         - .gitlab-ci.yml
         - .ostc-ci/*.yaml
+  artifacts:
+    # Disable collection of image artifacts. They are not used here and they
+    # are expensive to upload and store.
+    paths: []
