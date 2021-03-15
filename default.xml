@@ -29,4 +29,5 @@ SPDX-License-Identifier: Apache-2.0
 	<project name="meta-seco-imx" remote="seco-imx" revision="c1cd8a485eb5888dc14e2f4e7d399d415f1ba8bb" path="sources/meta-seco-imx" />
 
 	<project name="meta-ohos" revision="9f4e514ecebf15276886ab0ca40f021551687131" path="sources/meta-ohos" />
+	<project name="meta-clang" revision="7b96d2b0ca28bc299c8d0fa0e731f6266bf81ece" path="sources/poky/meta-clang" />
 </manifest>
