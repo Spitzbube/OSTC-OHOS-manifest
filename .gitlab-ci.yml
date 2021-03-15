@@ -12,9 +12,7 @@ include:
     # Include shared IP compliance jobs
     - 'dco.yaml'
     - 'reuse.yaml'
-    # Include the shared workspace job used as the foundation of our .build job.
-    - 'workspace.yaml'
- # Include the generic .build job.
+ # Include the generic .workspace and .build jobs.
  - local: '/.ostc-ci/build-generic.yaml'
  # Include the set of build flavours.
  - local: '/.ostc-ci/build-flavours.yaml'
