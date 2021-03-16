@@ -56,7 +56,8 @@ develop-linux-seco-imx8mm-c61:
   variables:
     MACHINE: seco-imx8mm-c61
     # This platform requires proprietary resources to boot.
-    OHOS_ACCEPT_FSL_EULA: 1
+    # See build-generic.yaml for explanation of OHOS_BB_LOCAL_CONF_ variables.
+    OHOS_BB_LOCAL_CONF_ACCEPT_FSL_EULA: 1
 
 develop-linux-stm32mp1-av96:
   extends: .build-develop-linux

@@ -228,10 +228,6 @@
     - !reference [.workspace, before_script]
   script:
     - !reference [.workspace, script]
-    # Accept Freescale EULA if required.
-    - if [ -n "$OHOS_ACCEPT_FSL_EULA" ]; then
-         echo 'ACCEPT_FSL_EULA = "1"' >> conf/local.conf;
-      fi
     # Non-tainted builds generate complete mirrors.
     - if [ -z "${OHOS_TAINTED_BUILD:-}" ]; then
          echo 'BB_GENERATE_MIRROR_TARBALLS = "1"' >> conf/local.conf;
