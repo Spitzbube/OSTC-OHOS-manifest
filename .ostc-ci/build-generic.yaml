@@ -78,19 +78,30 @@
     # definite value.
     OHOS_BUILD_FLAVOUR: ""
 
-    # OHOS_TAINTED_BUILD - set to non-empty value to "taint" the build, which
-    # sets the build and download cache to a private directory that is not
-    # publicly shared by the OSTC infrastructure. This can be used to create
-    # builds that download non-redistributable firmware, for example.
-    #
-    # This defaults to tainted builds, so that we can make the transition to
-    # explicitly tainted builds, without complex synchronization.
-    OHOS_TAINTED_BUILD: "1"
-
     # Point to https://example.net instead of the default https://example.com.
     # The OSTC cloud provider has misconfigured DNS which resolves the latter
     # incorrectly.
     OHOS_BB_LOCAL_CONF_CONNECTIVITY_CHECK_URIS: "https://example.net/"
+
+    # OHOS_BUILD_CACHE - set this to either "private" or "pub".
+    #
+    # By default all builds are assumed to be tainted, and use the private cache.
+    # If a given build configuration is not legally problematic, in the sense
+    # of pulling in code or blobs that are non-redistributable, this attribute
+    # can be set to "pub".
+    #
+    # Public build cache is exposed as https://cache.ostc-eu.org/ and can be
+    # used by third parties to speed up local builds.
+    OHOS_BUILD_CACHE: "private"
+
+    # Set DL_DIR and SSTATE_CACHE to either public (pub) or private build
+    # cache, depending on the value of $OHOS_BUILD_CACHE. Those are shared
+    # among all CI jobs running on the OSTC build cluster. This is what enables
+    # efficient builds and avoids (some) network problems that may be
+    # encountered when downloading third party source archives.
+    OHOS_BB_LOCAL_CONF_DL_DIR: /var/shared/$OHOS_BUILD_CACHE/bitbake/downloads
+    OHOS_BB_LOCAL_CONF_SSTATE_DIR: /var/shared/$OHOS_BUILD_CACHE/bitbake/sstate-cache
+
   before_script: &workspace-before
     # Bitbake requires a non-root user to operate.
     # The container should have a non-root user by default.
@@ -177,22 +188,6 @@
           | sort \
           | tee -a conf/local.conf )
 
-    # Re-configure the created build directory to use either public or private,
-    # shared download cache and sstate-cache. Those are shared among all CI
-    # jobs running on the OSTC build cluster. This is what enables efficient
-    # builds and avoids (some) network problems that may be encountered when
-    # downloading third party source archives.
-    #
-    # Public build cache is exposed as https://cache.ostc-eu.org/ and can be
-    # used by third parties to speed up local builds.
-    - if [ -n "$OHOS_TAINTED_BUILD" ]; then
-          echo 'DL_DIR = "/var/shared/private/bitbake/downloads"' >> conf/local.conf;
-          echo 'SSTATE_DIR = "/var/shared/private/bitbake/sstate-cache"' >> conf/local.conf;
-      else
-          echo 'DL_DIR = "/var/shared/pub/bitbake/downloads"' >> conf/local.conf;
-          echo 'SSTATE_DIR = "/var/shared/pub/bitbake/sstate-cache"' >> conf/local.conf;
-      fi
-
   after_script:
     # If the primary script failed early enough, the scratch dir may not have
     # been created yet. Check for that to avoid confusing errors.
@@ -228,10 +223,6 @@
     - !reference [.workspace, before_script]
   script:
     - !reference [.workspace, script]
-    # Non-tainted builds generate complete mirrors.
-    - if [ -z "${OHOS_TAINTED_BUILD:-}" ]; then
-         echo 'BB_GENERATE_MIRROR_TARBALLS = "1"' >> conf/local.conf;
-      fi
     # Build the desired recipe.
     - time bitbake "$OHOS_RECIPE_NAME"
     # Move artifacts for recovery, which only considers $CI_PROJECT_DIR and

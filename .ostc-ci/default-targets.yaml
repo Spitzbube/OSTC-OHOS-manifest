@@ -37,7 +37,8 @@ default-linux-qemu-x86_64:
   variables:
     MACHINE: qemux86-64
     # See the note on develop-linux-qemu-x86_64.
-    OHOS_TAINTED_BUILD: ""
+    OHOS_BUILD_CACHE: "pub"
+    OHOS_BB_LOCAL_CONF_BB_GENERATE_MIRROR_TARBALLS: 1
 
 default-linux-seco-intel-b68:
   extends: .build-default-linux
@@ -62,7 +63,8 @@ default-zephyr-qemu-x86:
   variables:
     MACHINE: qemu-x86
     # See the note on develop-linux-qemu-x86_64.
-    OHOS_TAINTED_BUILD: ""
+    OHOS_BUILD_CACHE: "pub"
+    OHOS_BB_LOCAL_CONF_BB_GENERATE_MIRROR_TARBALLS: 1
 
 default-zephyr-96b-nitrogen:
   extends: .build-default-zephyr
@@ -79,4 +81,5 @@ default-freertos-armv5:
   variables:
     MACHINE: qemuarmv5
     # See the note on develop-linux-qemu-x86_64.
-    OHOS_TAINTED_BUILD: ""
+    OHOS_BUILD_CACHE: "pub"
+    OHOS_BB_LOCAL_CONF_BB_GENERATE_MIRROR_TARBALLS: 1
