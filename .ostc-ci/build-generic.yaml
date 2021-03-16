@@ -86,6 +86,11 @@
     # This defaults to tainted builds, so that we can make the transition to
     # explicitly tainted builds, without complex synchronization.
     OHOS_TAINTED_BUILD: "1"
+
+    # Point to https://example.net instead of the default https://example.com.
+    # The OSTC cloud provider has misconfigured DNS which resolves the latter
+    # incorrectly.
+    OHOS_BB_LOCAL_CONF_CONNECTIVITY_CHECK_URIS: "https://example.net/"
   before_script: &workspace-before
     # Bitbake requires a non-root user to operate.
     # The container should have a non-root user by default.
@@ -171,11 +176,6 @@
           | sed -e 's/^OHOS_BB_LOCAL_CONF_//g' -e 's/"/\\"/g' -e 's/=/ = "/g' -e 's/$/"/g' \
           | sort \
           | tee -a conf/local.conf )
-
-    # Point to https://example.net instead of the default https://example.com.
-    # The OSTC cloud provider has misconfigured DNS which resolves the latter
-    # incorrectly.
-    - echo 'CONNECTIVITY_CHECK_URIS = "https://example.net/"' >> conf/local.conf
 
     # Re-configure the created build directory to use either public or private,
     # shared download cache and sstate-cache. Those are shared among all CI
