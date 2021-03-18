@@ -32,7 +32,7 @@ SPDX-FileCopyrightText: Huawei Inc.
 
 	<project name="meta-ohos" path="sources/meta-ohos" />
 	<project name="meta-python-dunfellplus" revision="dunfell" path="sources/meta-python-dunfellplus" />
-	<project name="meta-clang" revision="7b96d2b0ca28bc299c8d0fa0e731f6266bf81ece" path="sources/poky/meta-clang" />
+	<project name="meta-clang" revision="dd3f77ab7eceec369196ce685968019d2d9bdc43" path="sources/poky/meta-clang" />
 
 	<project name="docs" path="sources/docs" revision="master" />
 </manifest>
