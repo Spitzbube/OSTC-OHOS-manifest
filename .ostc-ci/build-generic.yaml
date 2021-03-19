@@ -187,6 +187,12 @@
           | sed -e 's/^OHOS_BB_LOCAL_CONF_//g' -e 's/"/\\"/g' -e 's/=/ = "/g' -e 's/$/"/g' \
           | sort \
           | tee -a conf/local.conf )
+      ( set +o pipefail;
+        env \
+          | grep -E '^OHOS_BB_LOCAL_CONF_plus_equals_[A-Z_0-9]+=' \
+          | sed -e 's/^OHOS_BB_LOCAL_CONF_plus_equals_//g' -e 's/"/\\"/g' -e 's/=/ += "/g' -e 's/$/"/g' \
+          | sort \
+          | tee -a conf/local.conf )
 
   after_script:
     # If the primary script failed early enough, the scratch dir may not have
