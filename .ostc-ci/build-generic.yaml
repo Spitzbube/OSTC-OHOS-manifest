@@ -102,6 +102,15 @@
     OHOS_BB_LOCAL_CONF_DL_DIR: /var/shared/$OHOS_BUILD_CACHE/bitbake/downloads
     OHOS_BB_LOCAL_CONF_SSTATE_DIR: /var/shared/$OHOS_BUILD_CACHE/bitbake/sstate-cache
 
+    # The path of the git repository to deviate from what the git-repo manifest
+    # prepares. This effectively allows testing incoming changes that match the
+    # repository holding this CI pipeline.
+    #
+    # The path is relative to the checked out "sources/" directory.
+    #
+    # This must be set by specific jobs which extend the .build job template.
+    OHOS_CI_GIT_REPO_PATH: ""
+
   before_script: &workspace-before
     # Bitbake requires a non-root user to operate.
     # The container should have a non-root user by default.
@@ -156,6 +165,17 @@
         echo "assumption violated - expected the workspace to contain the sources directory"
         && ls "$SCRATCH_DIR"
         && exit 1 )
+
+    # Switch the git repository which is being tested to the revision described
+    # by the CI environment variables. This can be used to simulate (future)
+    # updates in the manifest.
+    #
+    # This is applicable to CI for repositories containing layers.
+    - |
+      if [ -n "$OHOS_CI_GIT_REPO_PATH" ]; then
+        echo "CI: Switching $OHOS_CI_GIT_REPO_PATH to $CI_COMMIT_SHA";
+        ( cd sources/"$OHOS_CI_GIT_REPO_PATH" && git checkout "$CI_COMMIT_SHA" );
+      fi
 
   script: &workspace-do
     # Reload the value of SCRATCH_DIR set in the before_script phase. Those run
