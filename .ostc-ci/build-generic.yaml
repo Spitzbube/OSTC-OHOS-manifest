@@ -111,6 +111,18 @@
     # This must be set by specific jobs which extend the .build job template.
     OHOS_CI_GIT_REPO_PATH: ""
 
+    # Name of the bitbake recipe to upgrade.
+    #
+    # This must be set by specific jobs which extend the .build job template.
+    OHOS_CI_DEVTOOL_RECIPE_NAME: ""
+
+    # Path of the layer containing the recipe to upgrade.
+    #
+    # The path is used to perform "devtool" operations on the recipe and to
+    # place it back after automatic updates. Those modifications exist only as
+    # a part of the CI process, they are not merged anywhere.
+    OHOS_CI_DEVTOOL_LAYER_PATH: ""
+
   before_script: &workspace-before
     # Bitbake requires a non-root user to operate.
     # The container should have a non-root user by default.
@@ -122,6 +134,13 @@
     - test -n "$OHOS_BUILD_FLAVOUR" || (
         echo "precondition failed - set OHOS_BUILD_FLAVOUR to \"flavour\" of the build to use (e.g. linux)"
         && exit 1 )
+
+    # Check devtool operation is enabled and configured properly.
+    - |
+      if { [ -n "$OHOS_CI_DEVTOOL_RECIPE_NAME" ] && [ -z "$OHOS_CI_DEVTOOL_LAYER_PATH" ]; } || { [ -z "$OHOS_CI_DEVTOOL_RECIPE_NAME" ] && [ -n "$OHOS_CI_DEVTOOL_LAYER_PATH" ]; } then
+        echo "precondition failed - cannot define just one of OHOS_CI_DEVTOOL_RECIPE_NAME and OHOS_CI_DEVTOOL_LAYER_PATH"
+        exit 1
+      fi
 
     # Bitbake is configured to use /var/shared/bitbake directory
     # for both the download directory and the sstate-cache.
@@ -213,6 +232,34 @@
           | sed -e 's/^OHOS_BB_LOCAL_CONF_plus_equals_//g' -e 's/"/\\"/g' -e 's/=/ += "/g' -e 's/$/"/g' \
           | sort \
           | tee -a conf/local.conf )
+
+    # Update a specific bitbake recipe, which must use git, to point to the
+    # commit that is being tested here.
+    #
+    # This is applicable to CI for repositories containing source code that is
+    # packaged in an existing layer using git as the source code retrieval
+    # mechanism.
+    - |
+      if [ -n "$OHOS_CI_DEVTOOL_RECIPE_NAME" ] && [ -n "$OHOS_CI_DEVTOOL_LAYER_PATH" ]; then
+        echo "CI: Switching $OHOS_CI_DEVTOOL_RECIPE_NAME from $OHOS_CI_DEVTOOL_LAYER_PATH to $CI_COMMIT_SHA";
+        # Upgrade the recipe to point to the sources in the project directory.
+        # Pass --no-patch to skip applying patches that are present in the
+        # recipe. This pipeline is created for testing components that are
+        # developed alongside the layer, so the need to carry patches that are
+        # outside of git, is unlikely.
+        #
+        # NOTE: This requires the git repository specified in the recipe to
+        # have access to the SHA presented here.
+        time devtool upgrade --no-patch --srcrev "$CI_COMMIT_SHA" --srcbranch "$CI_COMMIT_REF_NAME" "$OHOS_CI_DEVTOOL_RECIPE_NAME";
+        # Switch the detached head created by devtool upgrade above, to a
+        # scratch branch. This is required for the devtool finish to work.
+        ( cd workspace/sources/"$OHOS_CI_DEVTOOL_RECIPE_NAME" && git checkout -b scratch );
+        # Finish the upgrade process and commit the change back to the layer.
+        # Because our recipe may have had patches, this step is required to
+        # correctly discard them ("devtool upgrade --no-patch" simply skipped
+        # them).
+        time devtool finish --remove-work --force "$OHOS_CI_DEVTOOL_RECIPE_NAME" "$(basename "$OHOS_CI_DEVTOOL_LAYER_PATH")";
+      fi
 
   after_script:
     # If the primary script failed early enough, the scratch dir may not have
