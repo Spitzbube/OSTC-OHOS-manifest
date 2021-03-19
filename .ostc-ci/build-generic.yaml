@@ -314,3 +314,5 @@
   rules:
     # Run the build when a merge request is created.
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    # Run the build when a tag is placed.
+    - if: '$CI_COMMIT_TAG'
