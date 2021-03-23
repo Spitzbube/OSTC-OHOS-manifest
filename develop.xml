@@ -4,6 +4,17 @@ SPDX-License-Identifier: Apache-2.0
 SPDX-FileCopyrightText: Huawei Inc.
 -->
 <manifest>
+	<notice>
+
+		Thank you for building development version of OpenHarmony. This
+		manifest file automatically follows changes in certain layers
+		and is suitable for development of OpenHarmony itself.
+
+		Check out OpenHarmony documentation at https://openharmony.readthedocs.org/
+
+		Meet the developers on mattermost at https://chat.ostc-eu.org/
+
+	</notice>
 	<remote name="github" fetch="https://github.com" />
 	<remote name="ohos" fetch="https://git.ostc-eu.org/OSTC/OHOS" />
 	<remote name="yocto" fetch="git://git.yoctoproject.org" />
