@@ -6,80 +6,63 @@
 # from the git repository:
 #   https://git.ostc-eu.org/OSTC/OHOS/manifest.git
 
-##
-## Template build jobs for default.xml
-##
-## This manifest is "stable" and uses pinned git hashes of all the repositories
-## it includes.
-##
+# TODO: merge this into build-generic.yaml
 
-.build-default-linux:
+linux-qemu-x86_64:
   extends: .build-linux
   variables:
-    OHOS_MANIFEST_NAME: default.xml
-
-.build-default-zephyr:
-  extends: .build-zephyr
-  variables:
-    OHOS_MANIFEST_NAME: default.xml
-
-.build-default-freertos:
-  extends: .build-freertos
-  variables:
-    OHOS_MANIFEST_NAME: default.xml
-
-##
-## Build jobs for default.xml
-##
-
-default-linux-qemu-x86_64:
-  extends: .build-default-linux
-  variables:
     MACHINE: qemux86-64
-    # See the note on develop-linux-qemu-x86_64.
+    # Set OHOS_BUILD_CACHE to "pub", overriding the value defined in the
+    # .build job. This enables sharing of download and sstate-cache created
+    # during this job.
+    #
+    # This is done assuming that there are no non-redistributable or otherwise
+    # tainted build intermediate files, downloads or published artifacts. All
+    # the non-tainted builds help to populate a cache exposed at
+    # https://cache.ostc-eu.org/bitbake
     OHOS_BUILD_CACHE: "pub"
     OHOS_BB_LOCAL_CONF_BB_GENERATE_MIRROR_TARBALLS: 1
 
-default-linux-seco-intel-b68:
-  extends: .build-default-linux
+linux-seco-intel-b68:
+  extends: .build-linux
   variables:
     MACHINE: seco-intel-b68
 
-default-linux-seco-imx8mm-c61:
-  extends: .build-default-linux
+linux-seco-imx8mm-c61:
+  extends: .build-linux
   variables:
     MACHINE: seco-imx8mm-c61
     # This platform requires proprietary resources to boot.
     # See build-generic.yaml for explanation of OHOS_BB_LOCAL_CONF_ variables.
     OHOS_BB_LOCAL_CONF_ACCEPT_FSL_EULA: 1
 
-default-linux-stm32mp1-av96:
-  extends: .build-default-linux
+linux-stm32mp1-av96:
+  extends: .build-linux
   variables:
     MACHINE: stm32mp1-av96
 
-default-zephyr-qemu-x86:
-  extends: .build-default-zephyr
+zephyr-qemu-x86:
+  extends: .build-zephyr
   variables:
     MACHINE: qemu-x86
-    # See the note on develop-linux-qemu-x86_64.
+    # See the note on linux-qemu-x86_64.
     OHOS_BUILD_CACHE: "pub"
     OHOS_BB_LOCAL_CONF_BB_GENERATE_MIRROR_TARBALLS: 1
 
-default-zephyr-96b-nitrogen:
-  extends: .build-default-zephyr
+zephyr-96b-nitrogen:
+  extends: .build-zephyr
   variables:
     MACHINE: 96b-nitrogen
 
-default-zephyr-96b-avenger:
-  extends: .build-default-zephyr
+zephyr-96b-avenger:
+  extends: .build-zephyr
   variables:
     MACHINE: 96b-avenger96
 
-default-freertos-armv5:
-  extends: .build-default-freertos
+freertos-armv5:
+  extends: .build-freertos
   variables:
     MACHINE: qemuarmv5
-    # See the note on develop-linux-qemu-x86_64.
+    # See the note on linux-qemu-x86_64.
     OHOS_BUILD_CACHE: "pub"
     OHOS_BB_LOCAL_CONF_BB_GENERATE_MIRROR_TARBALLS: 1

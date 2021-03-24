@@ -12,14 +12,13 @@ include:
     # Include shared IP compliance jobs
     - 'dco.yaml'
     - 'reuse.yaml'
+ # TODO: merge this into one file, for simplicity.
  # Include the generic .workspace and .build jobs.
  - local: '/.ostc-ci/build-generic.yaml'
  # Include the set of build flavours.
  - local: '/.ostc-ci/build-flavours.yaml'
- # Include the set of templates and jobs that use default.xml
+ # Include the set of jobs using the default manifest.
  - local: '/.ostc-ci/default-targets.yaml'
- # Include the set of templates and jobs that use develop.xml
- - local: '/.ostc-ci/develop-targets.yaml'
 
 dco:
   extends: .dco
@@ -50,8 +49,8 @@ reuse:
     paths: []
 
 # Perform scheduled builds with glibc instead of musl.
-develop-linux-glibc-qemu-x86_64:
-  extends: develop-linux-qemu-x86_64
+linux-glibc-qemu-x86_64:
+  extends: linux-qemu-x86_64
   variables:
     # This appends TCLIBC = "glibc" to conf/local.conf and interacts with
     # meta-ohos-core layer.

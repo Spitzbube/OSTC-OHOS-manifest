@@ -6,55 +6,25 @@
 # from the git repository:
 #   https://git.ostc-eu.org/OSTC/OHOS/manifest.git
 
-##
-## Template build jobs for develop.xml
-##
-## This manifest is "floating" and follows default branches of OSTC-specific repositories
-## it includes.
-##
-
-.build-develop-linux:
-  extends: .build-linux
-  variables:
-    OHOS_MANIFEST_NAME: develop.xml
-
-.build-develop-zephyr:
-  extends: .build-zephyr
-  variables:
-    OHOS_MANIFEST_NAME: develop.xml
-
-.build-develop-freertos:
-  extends: .build-freertos
-  variables:
-    OHOS_MANIFEST_NAME: develop.xml
-
-##
-## Build jobs for develop.xml
-##
+## NOTE: Those jobs are deprecated after the distinction
+#        between default.xml and develop.xml was removed.
 
 develop-linux-qemu-x86_64:
-  extends: .build-develop-linux
+  extends: .build-linux
   variables:
     MACHINE: qemux86-64
-    # Set OHOS_BUILD_CACHE to "pub", overriding the value defined in the
-    # .build job. This enables sharing of download and sstate-cache created
-    # during this job.
-    #
-    # This is done assuming that there are no non-redistributable or otherwise
-    # tainted build intermediate files, downloads or published artifacts. All
-    # the non-tainted builds help to populate a cache exposed at
-    # https://cache.ostc-eu.org/bitbake
+    # See the note on linux-qemu-x86_64.
     OHOS_BUILD_CACHE: "pub"
     # Generate archives for git mirrors pulled during this build.
     OHOS_BB_LOCAL_CONF_BB_GENERATE_MIRROR_TARBALLS: 1
 
 develop-linux-seco-intel-b68:
-  extends: .build-develop-linux
+  extends: .build-linux
   variables:
     MACHINE: seco-intel-b68
 
 develop-linux-seco-imx8mm-c61:
-  extends: .build-develop-linux
+  extends: .build-linux
   variables:
     MACHINE: seco-imx8mm-c61
     # This platform requires proprietary resources to boot.
@@ -62,32 +32,32 @@ develop-linux-seco-imx8mm-c61:
     OHOS_BB_LOCAL_CONF_ACCEPT_FSL_EULA: 1
 
 develop-linux-stm32mp1-av96:
-  extends: .build-develop-linux
+  extends: .build-linux
   variables:
     MACHINE: stm32mp1-av96
 
 develop-zephyr-qemu-x86:
-  extends: .build-develop-zephyr
+  extends: .build-zephyr
   variables:
     MACHINE: qemu-x86
-    # See the note on develop-linux-qemu-x86_64.
+    # See the note on linux-qemu-x86_64.
     OHOS_BUILD_CACHE: "pub"
     OHOS_BB_LOCAL_CONF_BB_GENERATE_MIRROR_TARBALLS: 1
 
 develop-zephyr-96b-nitrogen:
-  extends: .build-develop-zephyr
+  extends: .build-zephyr
   variables:
     MACHINE: 96b-nitrogen
 
 develop-zephyr-96b-avenger:
-  extends: .build-develop-zephyr
+  extends: .build-zephyr
   variables:
     MACHINE: 96b-avenger96
 
 develop-freertos-armv5:
-  extends: .build-develop-freertos
+  extends: .build-freertos
   variables:
     MACHINE: qemuarmv5
-    # See the note on develop-linux-qemu-x86_64.
+    # See the note on linux-qemu-x86_64.
     OHOS_BUILD_CACHE: "pub"
     OHOS_BB_LOCAL_CONF_BB_GENERATE_MIRROR_TARBALLS: 1

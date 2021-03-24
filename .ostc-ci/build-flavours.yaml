@@ -12,6 +12,8 @@
 ## Templates build jobs for each OpenHarmony flavor.
 ##
 
+# TODO: merge this into build-generic.yaml
+
 .build-linux:
   extends: .build
   variables:
@@ -29,4 +31,3 @@
   variables:
     OHOS_BUILD_FLAVOUR: freertos
     OHOS_RECIPE_NAME: freertos-demo
-
