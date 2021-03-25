@@ -8,10 +8,10 @@
 
 # TODO: merge this into build-generic.yaml
 
-linux-qemu-x86_64:
+linux-qemu-x86:
   extends: .build-linux
   variables:
-    MACHINE: qemux86-64
+    MACHINE: qemux86
     # Set OHOS_BUILD_CACHE to "pub", overriding the value defined in the
     # .build job. This enables sharing of download and sstate-cache created
     # during this job.
@@ -20,6 +20,32 @@ linux-qemu-x86_64:
     # tainted build intermediate files, downloads or published artifacts. All
     # the non-tainted builds help to populate a cache exposed at
     # https://cache.ostc-eu.org/bitbake
+    OHOS_BUILD_CACHE: "pub"
+    OHOS_BB_LOCAL_CONF_BB_GENERATE_MIRROR_TARBALLS: 1
+
+linux-qemu-x86_64:
+  extends: .build-linux
+  variables:
+    MACHINE: qemux86-64
+    # See the note on linux-qemu-x86.
+    OHOS_BUILD_CACHE: "pub"
+    OHOS_BB_LOCAL_CONF_BB_GENERATE_MIRROR_TARBALLS: 1
+
+linux-qemu-arm:
+  extends: .build-linux
+  # FIXME: https://git.ostc-eu.org/OSTC/OHOS/manifest/-/issues/26
+  allow_failure: true
+  variables:
+    MACHINE: qemuarm
+    # See the note on linux-qemu-x86.
+    OHOS_BUILD_CACHE: "pub"
+    OHOS_BB_LOCAL_CONF_BB_GENERATE_MIRROR_TARBALLS: 1
+
+linux-qemu-arm64:
+  extends: .build-linux
+  variables:
+    MACHINE: qemuarm64
+    # See the note on linux-qemu-x86.
     OHOS_BUILD_CACHE: "pub"
     OHOS_BB_LOCAL_CONF_BB_GENERATE_MIRROR_TARBALLS: 1
 
@@ -45,7 +71,15 @@ zephyr-qemu-x86:
   extends: .build-zephyr
   variables:
     MACHINE: qemu-x86
-    # See the note on linux-qemu-x86_64.
+    # See the note on linux-qemu-x86.
+    OHOS_BUILD_CACHE: "pub"
+    OHOS_BB_LOCAL_CONF_BB_GENERATE_MIRROR_TARBALLS: 1
+
+zephyr-qemu-cortex-m3:
+  extends: .build-zephyr
+  variables:
+    MACHINE: qemu-cortex-m3
+    # See the note on linux-qemu-x86.
     OHOS_BUILD_CACHE: "pub"
     OHOS_BB_LOCAL_CONF_BB_GENERATE_MIRROR_TARBALLS: 1
 
@@ -63,6 +97,6 @@ freertos-armv5:
   extends: .build-freertos
   variables:
     MACHINE: qemuarmv5
-    # See the note on linux-qemu-x86_64.
+    # See the note on linux-qemu-x86.
     OHOS_BUILD_CACHE: "pub"
     OHOS_BB_LOCAL_CONF_BB_GENERATE_MIRROR_TARBALLS: 1
