@@ -316,3 +316,116 @@
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
     # Run the build when a tag is placed.
     - if: '$CI_COMMIT_TAG'
+
+.build-linux:
+  extends: .build
+  variables:
+    OHOS_BUILD_FLAVOUR: linux
+    OHOS_RECIPE_NAME: openharmony-image-base-tests
+
+.build-zephyr:
+  extends: .build
+  variables:
+    OHOS_BUILD_FLAVOUR: zephyr
+    OHOS_RECIPE_NAME: zephyr-philosophers
+
+.build-freertos:
+  extends: .build
+  variables:
+    OHOS_BUILD_FLAVOUR: freertos
+    OHOS_RECIPE_NAME: freertos-demo
+
+# Jobs building one of the given recipes for specific MACHINE.
+
+linux-qemu-x86:
+  extends: .build-linux
+  variables:
+    MACHINE: qemux86
+    # Set OHOS_BUILD_CACHE to "pub", overriding the value defined in the
+    # .build job. This enables sharing of download and sstate-cache created
+    # during this job.
+    #
+    # This is done assuming that there are no non-redistributable or otherwise
+    # tainted build intermediate files, downloads or published artifacts. All
+    # the non-tainted builds help to populate a cache exposed at
+    # https://cache.ostc-eu.org/bitbake
+    OHOS_BUILD_CACHE: "pub"
+    OHOS_BB_LOCAL_CONF_BB_GENERATE_MIRROR_TARBALLS: 1
+
+linux-qemu-x86_64:
+  extends: .build-linux
+  variables:
+    MACHINE: qemux86-64
+    # See the note on linux-qemu-x86.
+    OHOS_BUILD_CACHE: "pub"
+    OHOS_BB_LOCAL_CONF_BB_GENERATE_MIRROR_TARBALLS: 1
+
+linux-qemu-arm:
+  extends: .build-linux
+  # FIXME: https://git.ostc-eu.org/OSTC/OHOS/manifest/-/issues/26
+  allow_failure: true
+  variables:
+    MACHINE: qemuarm
+    # See the note on linux-qemu-x86.
+    OHOS_BUILD_CACHE: "pub"
+    OHOS_BB_LOCAL_CONF_BB_GENERATE_MIRROR_TARBALLS: 1
+
+linux-qemu-arm64:
+  extends: .build-linux
+  variables:
+    MACHINE: qemuarm64
+    # See the note on linux-qemu-x86.
+    OHOS_BUILD_CACHE: "pub"
+    OHOS_BB_LOCAL_CONF_BB_GENERATE_MIRROR_TARBALLS: 1
+
+linux-seco-intel-b68:
+  extends: .build-linux
+  variables:
+    MACHINE: seco-intel-b68
+
+linux-seco-imx8mm-c61:
+  extends: .build-linux
+  variables:
+    MACHINE: seco-imx8mm-c61
+    # This platform requires proprietary resources to boot.
+    # See build-generic.yaml for explanation of OHOS_BB_LOCAL_CONF_ variables.
+    OHOS_BB_LOCAL_CONF_ACCEPT_FSL_EULA: 1
+
+linux-stm32mp1-av96:
+  extends: .build-linux
+  variables:
+    MACHINE: stm32mp1-av96
+
+zephyr-qemu-x86:
+  extends: .build-zephyr
+  variables:
+    MACHINE: qemu-x86
+    # See the note on linux-qemu-x86.
+    OHOS_BUILD_CACHE: "pub"
+    OHOS_BB_LOCAL_CONF_BB_GENERATE_MIRROR_TARBALLS: 1
+
+zephyr-qemu-cortex-m3:
+  extends: .build-zephyr
+  variables:
+    MACHINE: qemu-cortex-m3
+    # See the note on linux-qemu-x86.
+    OHOS_BUILD_CACHE: "pub"
+    OHOS_BB_LOCAL_CONF_BB_GENERATE_MIRROR_TARBALLS: 1
+
+zephyr-96b-nitrogen:
+  extends: .build-zephyr
+  variables:
+    MACHINE: 96b-nitrogen
+
+zephyr-96b-avenger:
+  extends: .build-zephyr
+  variables:
+    MACHINE: 96b-avenger96
+
+freertos-armv5:
+  extends: .build-freertos
+  variables:
+    MACHINE: qemuarmv5
+    # See the note on linux-qemu-x86.
+    OHOS_BUILD_CACHE: "pub"
+    OHOS_BB_LOCAL_CONF_BB_GENERATE_MIRROR_TARBALLS: 1

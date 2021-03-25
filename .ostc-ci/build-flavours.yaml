@@ -1,33 +1,8 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: Huawei Inc.
 
-# This file depends a definition of the .build job, which is specific to each
-# git repository's CI pipeline.
-#
-# In addition, it should be paired with develop-targets.yaml, which builds upon
-# those definitions to expand build coverage to the set of supported build
-# targets.
+# TODO: remove this file once meta-ohos and xts-acts are no
+# longer including it.
 
-##
-## Templates build jobs for each OpenHarmony flavor.
-##
-
-# TODO: merge this into build-generic.yaml
-
-.build-linux:
-  extends: .build
-  variables:
-    OHOS_BUILD_FLAVOUR: linux
-    OHOS_RECIPE_NAME: openharmony-image-base-tests
-
-.build-zephyr:
-  extends: .build
-  variables:
-    OHOS_BUILD_FLAVOUR: zephyr
-    OHOS_RECIPE_NAME: zephyr-philosophers
-
-.build-freertos:
-  extends: .build
-  variables:
-    OHOS_BUILD_FLAVOUR: freertos
-    OHOS_RECIPE_NAME: freertos-demo
+.dummy: # dummy job to have valid YAML.
+  script: echo 'dummy'
