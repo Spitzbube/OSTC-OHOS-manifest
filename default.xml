@@ -45,12 +45,17 @@ SPDX-FileCopyrightText: Huawei Inc.
 	<project name="governance/ip-policy" revision="cb1e5d76c77d729df8b5f47f250b637ccf80513c" path="ip-policy" />
 
 	<!--
-		This manifest contains "floating" entries, that follow branches and
-		not precise revisions. Those are all below this comment.
+		All entries above are pinned to a specific revision and updated manually.
 
-		When the develop branch is merged into master in anticipation of
-		the release, those repositories must be updated with a revision="..."
-		attribute, to pin them and make the entire release reproducible.
+		For the entries below this comment it depends on the phase of development
+		the project is in at the given time. In normal development mode it would be
+		"floating" entries, that follow branches and not precise revisions (this
+		can be identified by the missing revision="" tag).
+
+		When the release process is entered these would be pinned as well. Most
+		likely to a git tag in the repository. If a revision="" tag is present
+		this is the case.
+
 	-->
 
 	<project name="meta-ohos" path="sources/meta-ohos" />
