@@ -58,6 +58,6 @@ SPDX-FileCopyrightText: Huawei Inc.
 
 	-->
 
-	<project name="meta-ohos" revision="refs/tags/v0.1.0-rc1" path="sources/meta-ohos" />
-	<project name="docs" path="docs" revision="refs/tags/v0.1.0-rc1" />
+	<project name="meta-ohos" path="sources/meta-ohos" />
+	<project name="docs" path="docs" revision="main" />
 </manifest>
