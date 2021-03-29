@@ -43,6 +43,8 @@ reuse:
         - $OHOS_MANIFEST_NAME
         - .gitlab-ci.yml
         - .ostc-ci/*.yaml
+    # Run the build when a tag is placed.
+    - if: '$CI_COMMIT_TAG'
   artifacts:
     # Disable collection of image artifacts. They are not used here and they
     # are expensive to upload and store.
