@@ -35,6 +35,8 @@ reuse:
     # This setting is only valid in the manifest repository.
     OHOS_MANIFEST_BRANCH: "$CI_COMMIT_REF_NAME"
   rules:
+    # Run the build when it is scheduled.
+    - if: $CI_PIPELINE_SOURCE == "schedule"
     # Run the build when a merge request is created and the corresponding
     # manifest is modified. Or when the pipeline definition, or its components,
     # are changed.
