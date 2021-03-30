@@ -42,8 +42,6 @@ SPDX-FileCopyrightText: Huawei Inc.
 	<project name="meta-zephyr" revision="e7b1d7a348ccbfbf44d3dc81e40da2098227abcd" path="sources/meta-zephyr" />
 	<project name="meta-python-dunfellplus" revision="6aa32490d41ab3e09aa76f12ab2f9fa7c62ac1d3" path="sources/meta-python-dunfellplus" />
 
-	<project name="governance/ip-policy" revision="cb1e5d76c77d729df8b5f47f250b637ccf80513c" path="ip-policy" />
-
 	<!--
 		All entries above are pinned to a specific revision and updated manually.
 
@@ -60,4 +58,5 @@ SPDX-FileCopyrightText: Huawei Inc.
 
 	<project name="meta-ohos" path="sources/meta-ohos" />
 	<project name="docs" path="docs" revision="main" />
+	<project name="governance/ip-policy" revision="main" path="ip-policy" />
 </manifest>
