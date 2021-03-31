@@ -1,11 +1,8 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: Huawei Inc.
 
-# Build directories for specific targets
-build-*
+# Editor swap files
+*.swp
 
-# Repo marker or real installation
-.repo
-
-# Sources checked out by git-repo
-sources
+# Built documentation
+docs/build/
