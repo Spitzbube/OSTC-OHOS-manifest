@@ -5,6 +5,7 @@ stages:
   - compliance
   - build
   - test
+  - deploy
 
 include:
  - project: 'OSTC/infrastructure/pipelines'
@@ -62,3 +63,12 @@ linux-glibc-qemu-x86_64:
     OHOS_BB_LOCAL_CONF_TCLIBC: glibc
   rules:
     - if: $CI_PIPELINE_SOURCE == "schedule"
+
+# Build documentation present in the repository.
+build-docs:
+  extends: .build-docs
+
+# Trigger aggregation of OpenHarmony documentation.
+aggregate-docs:
+  extends: .aggregate-docs
+  needs: [build-docs]

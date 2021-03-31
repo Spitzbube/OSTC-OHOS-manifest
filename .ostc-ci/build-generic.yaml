@@ -429,3 +429,43 @@ freertos-armv5:
     # See the note on linux-qemu-x86.
     OHOS_BUILD_CACHE: "pub"
     OHOS_BB_LOCAL_CONF_BB_GENERATE_MIRROR_TARBALLS: 1
+
+.build-docs:
+  image:
+    name: registry.ostc-eu.org/ostc/containers/ostc-docs-builder
+  stage: build
+  script:
+    - make -C docs
+  artifacts:
+    paths:
+      - docs/build
+  rules:
+    # Build the docs when a merge request is created.
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      changes:
+        # React to changes to the docs directory.
+        - docs/**/*
+        # Run this job in case the pipeline changes.
+        - .ostc-ci/*.yml
+        - .gitlab-ci.yml
+    # Or when things land.
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+      changes:
+        # React to changes to the docs directory.
+        - docs/**/*
+        # Run this job in case the pipeline changes.
+        - .ostc-ci/*.yml
+        - .gitlab-ci.yml
+
+.aggregate-docs:
+  stage: deploy
+  trigger: OSTC/OHOS/docs
+  rules:
+    # Update the documentation when things land in the default branch.
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+      changes:
+        # React to changes to the docs directory.
+        - docs/**/*
+        # Run this job in case the pipeline changes.
+        - .ostc-ci/*.yml
+        - .gitlab-ci.yml
