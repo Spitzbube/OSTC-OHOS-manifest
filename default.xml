@@ -39,7 +39,7 @@ SPDX-FileCopyrightText: Huawei Inc.
 	<project name="meta-seco-imx" remote="seco-imx" revision="c1cd8a485eb5888dc14e2f4e7d399d415f1ba8bb" path="sources/meta-seco-imx" />
 	<project name="meta-clang" revision="dd3f77ab7eceec369196ce685968019d2d9bdc43" path="sources/poky/meta-clang" />
 	<project name="meta-av96" revision="294ed8b74d2555c3629e785c2ca16f8d2f400413" path="sources/meta-av96" />
-	<project name="meta-zephyr" revision="e7b1d7a348ccbfbf44d3dc81e40da2098227abcd" path="sources/meta-zephyr" />
+	<project name="meta-zephyr" revision="34f0e9d1d86fcd049d6f4e5afee05cf5e9a24a5a" path="sources/meta-zephyr" />
 	<project name="meta-python-dunfellplus" revision="6aa32490d41ab3e09aa76f12ab2f9fa7c62ac1d3" path="sources/meta-python-dunfellplus" />
 
 	<!--
