@@ -14,10 +14,10 @@ The *manifest* repository also contains job definitions that pipelines defined
 in other repositories can include. Those are all stored in the `.ostc-ci`
 directory. Internally, in the manifest repository, the same rules are used to
 create a git-repo workspace, synchronize all the git repositories, initialize
-and configure bitbake and build bitbake recipes corresponding to supported
+and configure BitBake and build BitBake recipes corresponding to supported
 reference boards.
 
 .. toctree::
    :maxdepth: 1
-      
-   ci
+
+   ci/index

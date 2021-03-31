@@ -1,150 +1,18 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: Huawei Inc.
 
-# The workspace pipeline prepares a temporary working directory with the
-# combined source tree, prepared by git-repo, and bitbake prepared for
-# executing tasks. This workspace is *not* constructed in the default directory
-# managed by GitLab, to avoid clashes with a git-repo workflow, it is
-# constructed entirely in a temporary directory. There's some logic to store
-# and restore the path of that directory (SCRATCH_DIR) between script section
-# which run in separate shell processes.
-#
-# There are two places for integration, apart from the variables that are
-# documented below. Adding elements to the "before_script" section can
-# customize the workspace before bitbake is initialized. This can be used to
-# switch git repositories to other branches, for examples. The "script" section
-# initializes bitbake, and allows additional customization, to add or remove
-# layers, for example.
-#
-# Both script section are available as YAML anchors, called workspace-before
-# and workspace-do respectively. Keep in mind that GitLab imposes some
-# limitation on anchors, so you can reliably only use them one level away, that
-# is, in a job that is directly extended by the workspace job. Look at other
-# pipelines using this job for inspiration.
-#
-# This is a pipeline job that is used via the "extends" mechanism below.
-# For reference see https://docs.gitlab.com/ee/ci/yaml/README.html
-#
-# For practical uses see the pipeline definitions for:
-# - https://git.ostc-eu.org/OSTC/OHOS/manifest (manifest-wide tests)
-# - https://git.ostc-eu.org/OSTC/OHOS/meta-ohos (layer or layer group)
-# - https://git.ostc-eu.org/OSTC/OHOS/components/staging/xts_acts (component
-#   with existing recipe)
+# This job is documented in docs/ci/hidden-jobs/workspace.rst
 .workspace:
-  # This pipeline relies on a container with additional pre-installed software:
-  # - git and git-repo program to process the manifest
-  # - all of the dependencies of bitbake (basic toolchain, python, many tools)
-  # Precise, machine readable description of this container can be found
-  # in https://git.ostc-eu.org/OSTC/containers/-/blob/master/ostc-builder/Dockerfile
   image:
     name: registry.ostc-eu.org/ostc/containers/ostc-builder:latest
-  # The pipeline relies on being scheduled to a GitLab worker with the
-  # following properties:
-  # - sufficient amount of disk space (~ 100GB will do).
-  # - non-ephemeral disk mounted at /var/shared with even more space (~500GB)
-  #   that is shared between runs of this pipeline. This is where the bitbake
-  #   download directory and sstate-cache are configured below.
-  # - additional CPU cores as the build process is very long.
   tags: [large-disk]
-  # Conservative timeout in case the build machine is busy and the cache is cold.
-  timeout: 3 hours
   variables:
-    # OHOS_MANIFEST_URL - the URL consumed by git-repo. You only want to
-    # change this if you forked the entire OHOS infrastructure and want to use
-    # it in private.
     OHOS_MANIFEST_URL: https://git.ostc-eu.org/OSTC/OHOS/manifest
-
-    # OHOS_MANIFEST_BRANCH - the name of the git branch of the manifest
-    # repository. Normally use "develop" here, which is the default branch.
-    # For testing changes coming into the manifest repository itself, use
-    # $CI_COMMIT_REF_NAME here.
     OHOS_MANIFEST_BRANCH: develop
-
-    # OHOS_MANIFEST_NAME - the name of the manifest file from the repository
-    # mentioned above. The default is "default.xml". This option is kept for
-    # backwards compatibility, when the CI system was using one of two
-    # different manifest files.
     OHOS_MANIFEST_NAME: default.xml
-
-    # OHOS_BUILD_FLAVOUR - the name of the "flavour" of OpenHarmony, you have
-    # to pick "linux", "zephyr" or "freertos". This value has no default and is
-    # verified in the "before_script", so any concrete job needs to assign a
-    # definite value.
-    OHOS_BUILD_FLAVOUR: ""
-
-    # Point to https://example.net instead of the default https://example.com.
-    # The OSTC cloud provider has misconfigured DNS which resolves the latter
-    # incorrectly.
-    OHOS_BB_LOCAL_CONF_CONNECTIVITY_CHECK_URIS: "https://example.net/"
-
-    # OHOS_BUILD_CACHE - set this to either "private" or "pub".
-    #
-    # By default all builds are assumed to be tainted, and use the private cache.
-    # If a given build configuration is not legally problematic, in the sense
-    # of pulling in code or blobs that are non-redistributable, this attribute
-    # can be set to "pub".
-    #
-    # Public build cache is exposed as https://cache.ostc-eu.org/ and can be
-    # used by third parties to speed up local builds.
-    OHOS_BUILD_CACHE: "private"
-
-    # Set DL_DIR and SSTATE_CACHE to either public (pub) or private build
-    # cache, depending on the value of $OHOS_BUILD_CACHE. Those are shared
-    # among all CI jobs running on the OSTC build cluster. This is what enables
-    # efficient builds and avoids (some) network problems that may be
-    # encountered when downloading third party source archives.
-    OHOS_BB_LOCAL_CONF_DL_DIR: /var/shared/$OHOS_BUILD_CACHE/bitbake/downloads
-    OHOS_BB_LOCAL_CONF_SSTATE_DIR: /var/shared/$OHOS_BUILD_CACHE/bitbake/sstate-cache
-
-    # The path of the git repository to deviate from what the git-repo manifest
-    # prepares. This effectively allows testing incoming changes that match the
-    # repository holding this CI pipeline.
-    #
-    # The path is relative to the checked out "sources/" directory.
-    #
-    # This must be set by specific jobs which extend the .build job template.
+    OHOS_MANIFEST_MIRROR: ostc-develop
     OHOS_CI_GIT_REPO_PATH: ""
-
-    # Name of the bitbake recipe to upgrade.
-    #
-    # This must be set by specific jobs which extend the .build job template.
-    OHOS_CI_DEVTOOL_RECIPE_NAME: ""
-
-    # Path of the layer containing the recipe to upgrade.
-    #
-    # The path is used to perform "devtool" operations on the recipe and to
-    # place it back after automatic updates. Those modifications exist only as
-    # a part of the CI process, they are not merged anywhere.
-    OHOS_CI_DEVTOOL_LAYER_PATH: ""
-
-  before_script: &workspace-before
-    # Bitbake requires a non-root user to operate.
-    # The container should have a non-root user by default.
-    - test "$(id -u)" -ne 0 || (
-        echo "precondition failed - this job cannot run as root"
-        && exit 1 )
-
-    # Check if the job is configured properly.
-    - test -n "$OHOS_BUILD_FLAVOUR" || (
-        echo "precondition failed - set OHOS_BUILD_FLAVOUR to \"flavour\" of the build to use (e.g. linux)"
-        && exit 1 )
-
-    # Check devtool operation is enabled and configured properly.
-    - |
-      if { [ -n "$OHOS_CI_DEVTOOL_RECIPE_NAME" ] && [ -z "$OHOS_CI_DEVTOOL_LAYER_PATH" ]; } || { [ -z "$OHOS_CI_DEVTOOL_RECIPE_NAME" ] && [ -n "$OHOS_CI_DEVTOOL_LAYER_PATH" ]; } then
-        echo "precondition failed - cannot define just one of OHOS_CI_DEVTOOL_RECIPE_NAME and OHOS_CI_DEVTOOL_LAYER_PATH"
-        exit 1
-      fi
-
-    # Bitbake is configured to use /var/shared/bitbake directory
-    # for both the download directory and the sstate-cache.
-    - test -w /var/shared/bitbake || (
-        echo "precondition failed - expected /var/shared/bitbake to be writable"
-        && exit 1 )
-
-    # Log available disk space on the persistent shared disk.
-    - df -h /var/shared/bitbake
-
+  before_script:
     - test ! -e "$CI_PROJECT_DIR"/.scratch-dir-name || (
         echo "precondition failed - concurrent modification of $CI_PROJECT_DIR"
         && env | grep CI_ | sort
@@ -158,50 +26,91 @@
     - echo "$SCRATCH_DIR" > "$CI_PROJECT_DIR"/.scratch-dir-name
     - cd "$SCRATCH_DIR"
 
-    # Create a git-repo workspace with all the files checked out.
-    #
-    # The checkout uses a mirror that is maintained in a separate pipeline
-    # https://git.ostc-eu.org/OSTC/infrastructure/ostc-manifest-mirror Even if
-    # the mirror is out-of-date, the sync command succeeds and downloads any
-    # delta required. This lowers the load on community servers and our traffic
-    # bill.
     - repo init --reference
-           /var/shared/pub/git-repo-mirrors/ostc-develop
+           /var/shared/pub/git-repo-mirrors/"$OSTC_MANIFEST_MIRROR"
            --manifest-url "$OHOS_MANIFEST_URL"
            --manifest-name "$OHOS_MANIFEST_NAME"
            --manifest-branch "$OHOS_MANIFEST_BRANCH"
     - time repo sync --no-clone-bundle
 
-    # We subsequently rely on the sources/ directory that must be described by
-    # the manifest file.
-    - test -d sources || (
-        echo "assumption violated - expected the workspace to contain the sources directory"
-        && ls "$SCRATCH_DIR"
-        && exit 1 )
+    # XXX: Backwards compatibility feature that can be removed later.
+    # The variable OHOS_CI_GIT_REPO_PATH may be, when set, an implicit
+    # sub-directory of the sources/ directory.
+    - |
+      if [ -n "$OHOS_CI_GIT_REPO_PATH" ] && [ ! -e "$OHOS_CI_GIT_REPO_PATH" ]; then
+        echo "CI: Prepending sources/ to OHOS_CI_GIT_REPO_PATH";
+        OHOS_CI_GIT_REPO_PATH=sources/"$OHOS_CI_GIT_REPO_PATH";
+      fi
 
-    # Switch the git repository which is being tested to the revision described
-    # by the CI environment variables. This can be used to simulate (future)
-    # updates in the manifest.
-    #
-    # This is applicable to CI for repositories containing layers.
+    # See the documentation of OHOS_CI_GIT_REPO_PATH
     - |
       if [ -n "$OHOS_CI_GIT_REPO_PATH" ]; then
         if [ -n "$CI_MERGE_REQUEST_SOURCE_PROJECT_URL" ]; then
             echo "CI: Adding $CI_MERGE_REQUEST_SOURCE_PROJECT_URL as remote 'incoming'";
-            ( cd sources/"$OHOS_CI_GIT_REPO_PATH" \
+            ( cd "$OHOS_CI_GIT_REPO_PATH" \
                 && git remote add incoming "$CI_MERGE_REQUEST_SOURCE_PROJECT_URL" \
                 && git fetch incoming "$CI_COMMIT_REF_NAME" );
         fi;
         echo "CI: Switching $OHOS_CI_GIT_REPO_PATH to $CI_COMMIT_SHA";
-        ( cd sources/"$OHOS_CI_GIT_REPO_PATH" && git checkout "$CI_COMMIT_SHA" );
+        ( cd "$OHOS_CI_GIT_REPO_PATH" && git checkout "$CI_COMMIT_SHA" );
       fi
 
-  script: &workspace-do
+  script:
     # Reload the value of SCRATCH_DIR set in the before_script phase. Those run
     # in separate shell processes and do not share environment variables.
     - SCRATCH_DIR="$(cat "$CI_PROJECT_DIR"/.scratch-dir-name)"
     - cd "$SCRATCH_DIR"
 
+  after_script:
+    # If the primary script failed early enough, the scratch dir may not have
+    # been created yet. Check for that to avoid confusing errors.
+    - test -f "$CI_PROJECT_DIR"/.scratch-dir-name || exit 0
+    # Reload the value of SCRATCH_DIR set in the before_script phase.
+    - SCRATCH_DIR="$(cat "$CI_PROJECT_DIR"/.scratch-dir-name)"
+    # Clean up after ourselves.
+    - rm -f "$CI_PROJECT_DIR"/.scratch-dir-name
+    - rm -rf "$SCRATCH_DIR"
+
+# This job is documented in docs/ci/hidden-jobs/bitbake-workspace.rst
+.bitbake-workspace:
+  extends: .workspace
+  stage: build
+  variables:
+    OHOS_BUILD_FLAVOUR: ""
+    OHOS_BUILD_CACHE: "private"
+    OHOS_BB_LOCAL_CONF_CONNECTIVITY_CHECK_URIS: "https://example.net/"
+    OHOS_BB_LOCAL_CONF_DL_DIR: /var/shared/$OHOS_BUILD_CACHE/bitbake/downloads
+    OHOS_BB_LOCAL_CONF_SSTATE_DIR: /var/shared/$OHOS_BUILD_CACHE/bitbake/sstate-cache
+    OHOS_CI_DEVTOOL_RECIPE_NAME: ""
+    OHOS_CI_DEVTOOL_LAYER_PATH: ""
+
+  before_script:
+    # Bitbake requires a non-root user to operate.
+    # The container should have a non-root user by default.
+    - test "$(id -u)" -ne 0 || (
+        echo "precondition failed - this job cannot run as root"
+        && exit 1 )
+    # Check if the job is configured properly.
+    - test -n "$OHOS_BUILD_FLAVOUR" || (
+        echo "precondition failed - set OHOS_BUILD_FLAVOUR to \"flavour\" of the build to use (e.g. linux)"
+        && exit 1 )
+    # Check devtool operation is enabled and configured properly.
+    - |
+      if { [ -n "$OHOS_CI_DEVTOOL_RECIPE_NAME" ] && [ -z "$OHOS_CI_DEVTOOL_LAYER_PATH" ]; } || { [ -z "$OHOS_CI_DEVTOOL_RECIPE_NAME" ] && [ -n "$OHOS_CI_DEVTOOL_LAYER_PATH" ]; } then
+        echo "precondition failed - cannot define just one of OHOS_CI_DEVTOOL_RECIPE_NAME and OHOS_CI_DEVTOOL_LAYER_PATH"
+        exit 1
+      fi
+    # Bitbake is configured to use /var/shared/bitbake directory
+    # for both the download directory and the sstate-cache.
+    - test -w /var/shared/bitbake || (
+        echo "precondition failed - expected /var/shared/bitbake to be writable"
+        && exit 1 )
+    # Log available disk space on the persistent shared disk.
+    - df -h /var/shared/bitbake
+    - !reference [.workspace, before_script]
+
+  script:
+    - !reference [.workspace, script]
     # Initialize bitbake build environment by sourcing the oe-init-build-env
     # into the running bash process. This has the side-effect of changing the
     # current working directory and populating the $SCRATCH_DIR/build
@@ -233,20 +142,25 @@
           | sort \
           | tee -a conf/local.conf )
 
+
+    # Sanity check: disallow using public build cache with a specific setting
+    # in local.conf. The list of settings may grow over time.
+    - |
+      if [ "$OHOS_BUILD_CACHE" != private ]; then
+        if [ grep -qF 'ACCEPT_FSL_EULA = "1"' conf/local.conf ]; then
+          echo "cannot use OHOS_BUILD_CACHE=$OHOS_BUILD_CACHE with ACCEPT_FSL_EULA = \"1\""
+          exit 1
+        fi
+      fi
+
     # Update a specific bitbake recipe, which must use git, to point to the
     # commit that is being tested here.
-    #
-    # This is applicable to CI for repositories containing source code that is
-    # packaged in an existing layer using git as the source code retrieval
-    # mechanism.
     - |
       if [ -n "$OHOS_CI_DEVTOOL_RECIPE_NAME" ] && [ -n "$OHOS_CI_DEVTOOL_LAYER_PATH" ]; then
         echo "CI: Switching $OHOS_CI_DEVTOOL_RECIPE_NAME from $OHOS_CI_DEVTOOL_LAYER_PATH to $CI_COMMIT_SHA";
         # Upgrade the recipe to point to the sources in the project directory.
         # Pass --no-patch to skip applying patches that are present in the
-        # recipe. This pipeline is created for testing components that are
-        # developed alongside the layer, so the need to carry patches that are
-        # outside of git, is unlikely.
+        # recipe.
         #
         # NOTE: This requires the git repository specified in the recipe to
         # have access to the SHA presented here.
@@ -260,82 +174,41 @@
         # them).
         time devtool finish --remove-work --force "$OHOS_CI_DEVTOOL_RECIPE_NAME" "$(basename "$OHOS_CI_DEVTOOL_LAYER_PATH")";
       fi
-
-  after_script:
-    # If the primary script failed early enough, the scratch dir may not have
-    # been created yet. Check for that to avoid confusing errors.
-    - test -f "$CI_PROJECT_DIR"/.scratch-dir-name || exit 0
-    # Reload the value of SCRATCH_DIR set in the before_script phase.
-    - SCRATCH_DIR="$(cat "$CI_PROJECT_DIR"/.scratch-dir-name)"
-    # Collect stats after the build.
-    - du -sh "$SCRATCH_DIR"/build/* || true
-    # Clean up after ourselves.
-    - rm -f "$CI_PROJECT_DIR"/.scratch-dir-name
-    - rm -rf "$SCRATCH_DIR"
-
-.build:
-  # Extend the workspace job. This effectively gives us an assembled tree and
-  # initialized bitbake. Some essential variables are defined in later jobs,
-  # like .build-linux, which sets OHOS_BUILD_FLAVOUR, which is inherited from
-  # the .workspace job.
-  extends: .workspace
-  stage: build
-  # Conservative timeout in case the build machine is busy and the cache is cold.
-  timeout: 3 hours
-  variables:
-    # Name of the bitbake recipe to build. This must be set by specific jobs
-    # which extend the .build job template.
-    OHOS_RECIPE_NAME: ""
-    # Set to non-empty value to accept Freescale EULA.
-    OHOS_ACCEPT_FSL_EULA: ""
-  before_script:
-    # Check if the job is configured properly.
-    - test -n "$OHOS_RECIPE_NAME" || (
-        echo "precondition failed - set OHOS_RECIPE_NAME to the name of the recipe to build"
-        && exit 1 )
-    - !reference [.workspace, before_script]
-  script:
-    - !reference [.workspace, script]
-    # Build the desired recipe.
-    - time bitbake "$OHOS_RECIPE_NAME"
-    # Move artifacts for recovery, which only considers $CI_PROJECT_DIR and
-    # subdirectories.
-    - mkdir -p "$CI_PROJECT_DIR"/artifacts
-    # The name of the build-specific tmp directory may vary. Ask bitbake
-    # instead of hard-coding it. This is currently only relevant for Zephyr,
-    # which uses tmp-newlib.
-    - eval "$(bitbake -e | grep ^TMPDIR= | sed -e 's/^TMPDIR/BITBAKE_TMPDIR/g')"
-    - mv "$BITBAKE_TMPDIR"/deploy/images/ "$CI_PROJECT_DIR"/artifacts || true
-    - mv "$BITBAKE_TMPDIR"/deploy/licenses/ "$CI_PROJECT_DIR"/artifacts || true
-    # TODO: copy all build logs as well.
-  artifacts:
-    paths:
-      - artifacts/
   rules:
-    # Run the build when a merge request is created.
+    # Run the job when a merge request is created.
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-    # Run the build when a tag is placed.
+    # Run the job when a tag is placed.
     - if: '$CI_COMMIT_TAG'
 
+# This job is documented in docs/ci/hidden-jobs/build-linux.rst
 .build-linux:
-  extends: .build
+  extends: .bitbake-workspace
   variables:
     OHOS_BUILD_FLAVOUR: linux
-    OHOS_RECIPE_NAME: openharmony-image-base-tests
+  script:
+    - !reference [.bitbake-workspace, script]
+    - time bitbake openharmony-image-base-tests
+    - time bitbake openharmony-image-extra-tests
 
+# This job is documented in docs/ci/hidden-jobs/build-zephyr.rst
 .build-zephyr:
-  extends: .build
+  extends: .bitbake-workspace
   variables:
     OHOS_BUILD_FLAVOUR: zephyr
-    OHOS_RECIPE_NAME: zephyr-philosophers
+  script:
+    - !reference [.bitbake-workspace, script]
+    - time bitbake zephyr-philosophers
 
+# This job is documented in docs/ci/hidden-jobs/build-freertos.rst
 .build-freertos:
-  extends: .build
+  extends: .bitbake-workspace
   variables:
     OHOS_BUILD_FLAVOUR: freertos
-    OHOS_RECIPE_NAME: freertos-demo
+  script:
+    - !reference [.bitbake-workspace, script]
+    - time bitbake freertos-demo
 
-# Jobs building one of the given recipes for specific MACHINE.
+# The following jobs are documented in docs/ci/shared-jobs.rst
 
 linux-qemu-x86:
   extends: .build-linux
@@ -362,8 +235,6 @@ linux-qemu-x86_64:
 
 linux-qemu-arm:
   extends: .build-linux
-  # FIXME: https://git.ostc-eu.org/OSTC/OHOS/manifest/-/issues/26
-  allow_failure: true
   variables:
     MACHINE: qemuarm
     # See the note on linux-qemu-x86.
@@ -430,6 +301,39 @@ freertos-armv5:
     OHOS_BUILD_CACHE: "pub"
     OHOS_BB_LOCAL_CONF_BB_GENERATE_MIRROR_TARBALLS: 1
 
+# This job is documented in docs/ci/hidden-jobs/build-recipe.rst
+.build-recipe:
+  extends: .bitbake-workspace
+  variables:
+    OHOS_RECIPE_NAME: ""
+  script:
+    - !reference [.bitbake-workspace, script]
+    - time bitbake "$OHOS_RECIPE_NAME"
+
+# This job is documented in docs/ci/hidden-jobs/build-image.rst
+.build-image:
+  extends: .build-recipe
+  script:
+    - !reference [.build-recipe, script]
+    # Move artifacts for recovery, which only considers $CI_PROJECT_DIR and
+    # subdirectories.
+    - mkdir -p "$CI_PROJECT_DIR"/artifacts
+    # The name of the build-specific tmp directory may vary. Ask bitbake
+    # instead of hard-coding it. This is currently only relevant for Zephyr,
+    # which uses tmp-newlib.
+    - eval "$(bitbake -e | grep ^TMPDIR= | sed -e 's/^TMPDIR/BITBAKE_TMPDIR/g')"
+    - mv "$BITBAKE_TMPDIR"/deploy/images/ "$CI_PROJECT_DIR"/artifacts || true
+    - mv "$BITBAKE_TMPDIR"/deploy/licenses/ "$CI_PROJECT_DIR"/artifacts || true
+  artifacts:
+    paths:
+      - artifacts/
+
+# This job is currently used to customize the behavior in meta-ohos and xts-acts.
+# It will be removed when that is safe to do so. It is not documented.
+.build:
+ extends: .build-recipe
+
+# This job is documented in docs/ci/hidden-jobs/build-docs.rst
 .build-docs:
   image:
     name: registry.ostc-eu.org/ostc/containers/ostc-docs-builder
@@ -457,6 +361,7 @@ freertos-armv5:
         - .ostc-ci/*.yml
         - .gitlab-ci.yml
 
+# This job is documented in docs/ci/hidden-jobs/aggregate-docs.rst
 .aggregate-docs:
   stage: deploy
   trigger: OSTC/OHOS/docs
