@@ -38,6 +38,9 @@ reuse:
   rules:
     # Run the build when it is scheduled.
     - if: $CI_PIPELINE_SOURCE == "schedule"
+    # Do not run pipelines for draft merge requests unless manually triggered.
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TITLE =~ /^(wip|draft):.*/i'
+      when: manual
     # Run the build when a merge request is created and the corresponding
     # manifest is modified. Or when the pipeline definition, or its components,
     # are changed.
