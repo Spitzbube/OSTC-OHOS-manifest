@@ -41,6 +41,7 @@ SPDX-FileCopyrightText: Huawei Inc.
 	<project name="meta-av96" revision="b8e6ed27285c6e86f89398a7029997652afb8002" path="sources/meta-av96" />
 	<project name="meta-zephyr" revision="34f0e9d1d86fcd049d6f4e5afee05cf5e9a24a5a" path="sources/meta-zephyr" />
 	<project name="meta-python-dunfellplus" revision="6aa32490d41ab3e09aa76f12ab2f9fa7c62ac1d3" path="sources/meta-python-dunfellplus" />
+	<project name="meta-raspberrypi" remote="yocto" revision="77190af02d48adc2b28216775e6318e9eeda571c" path="sources/meta-raspberrypi" />
 
 	<!--
 		All entries above are pinned to a specific revision and updated manually.
