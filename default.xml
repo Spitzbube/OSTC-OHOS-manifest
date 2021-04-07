@@ -24,6 +24,12 @@ SPDX-FileCopyrightText: Huawei Inc.
 	<remote name="seco-imx" fetch="https://git.seco.com/pub/i.mx/yocto/5.x" />
 	<remote name="stm" fetch="https://github.com/STMicroelectronics" />
 
+	<!--
+		OpenHarmony build system is based on Yocto "dunfell"
+		(3.1 - see https://wiki.yoctoproject.org/wiki/Releases for more information).
+		Hence, the layers setup below uses corresponding "dunfell" layers or "dunfell" compatible revisions.
+	-->
+
 	<default remote="ohos" revision="develop" sync-j="4" />
 	<project name="poky" remote="yocto" revision="9ee329c18fbe0c42eaf3d43657ea30591f79143b" path="sources/poky" />
 	<project name="meta-openembedded" revision="6fd6cd72e236303fba94273f2a94a2c11c59d71e" path="sources/meta-openembedded" />
