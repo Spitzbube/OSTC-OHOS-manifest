@@ -56,7 +56,7 @@ SPDX-FileCopyrightText: Huawei Inc.
 
 	-->
 
-	<project name="meta-ohos" path="sources/meta-ohos" />
-	<project name="docs" path="docs" revision="main" />
-	<project name="governance/ip-policy" revision="main" path="ip-policy" />
+	<project name="meta-ohos" path="sources/meta-ohos" revision="refs/tags/v0.1.0" />
+	<project name="docs" path="docs" revision="refs/tags/v0.1.0" />
+	<project name="governance/ip-policy" revision="refs/tags/v0.1.0" path="ip-policy" />
 </manifest>
