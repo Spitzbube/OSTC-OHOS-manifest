@@ -6,11 +6,11 @@ SPDX-FileCopyrightText: Huawei Inc.
 <manifest>
 	<notice>
 
-		Thank you for building development version of OpenHarmony. This
+		Thank you for building development version of AllScenariOS. This
 		manifest file automatically follows changes in certain layers
-		and is suitable for development of OpenHarmony itself.
+		and is suitable for development of AllScenariOS itself.
 
-		Check out OpenHarmony documentation at https://openharmony.readthedocs.org/
+		Check out AllScenariOS documentation at https://openharmony.readthedocs.org/
 
 		Meet the developers on mattermost at https://chat.ostc-eu.org/
 
@@ -25,7 +25,7 @@ SPDX-FileCopyrightText: Huawei Inc.
 	<remote name="stm" fetch="https://github.com/STMicroelectronics" />
 
 	<!--
-		OpenHarmony build system is based on Yocto "dunfell"
+		AllScenariOS build system is based on Yocto "dunfell"
 		(3.1 - see https://wiki.yoctoproject.org/wiki/Releases for more information).
 		Hence, the layers setup below uses corresponding "dunfell" layers or "dunfell" compatible revisions.
 	-->
