@@ -71,7 +71,7 @@ linux-glibc-qemu-x86_64:
 build-docs:
   extends: .build-docs
 
-# Trigger aggregation of OpenHarmony documentation.
+# Trigger aggregation of AllScenariOS documentation.
 aggregate-docs:
   extends: .aggregate-docs
   needs: [build-docs]
