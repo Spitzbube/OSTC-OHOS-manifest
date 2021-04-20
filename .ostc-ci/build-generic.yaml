@@ -187,8 +187,8 @@
     OHOS_BUILD_FLAVOUR: linux
   script:
     - !reference [.bitbake-workspace, script]
-    - time bitbake openharmony-image-base-tests
-    - time bitbake openharmony-image-extra-tests
+    - time bitbake allscenarios-image-base-tests
+    - time bitbake allscenarios-image-extra-tests
 
 # This job is documented in docs/ci/hidden-jobs/build-zephyr.rst
 .build-zephyr:
