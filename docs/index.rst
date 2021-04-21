@@ -8,7 +8,7 @@ The manifest Repository
 .. _manifest repository: https://git.ostc-eu.org/OSTC/OHOS/manifest.git
 
 The `manifest repository`_ contains the "map" to all the other repositories used
-by AllScenariOS and is thus important from CI point of view.
+by All Scenario OS and is thus important from CI point of view.
 
 The *manifest* repository also contains job definitions that pipelines defined
 in other repositories can include. Those are all stored in the `.ostc-ci`
