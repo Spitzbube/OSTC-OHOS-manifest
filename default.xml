@@ -31,7 +31,7 @@ SPDX-FileCopyrightText: Huawei Inc.
 	-->
 
 	<default remote="ohos" revision="develop" sync-j="4" />
-	<project name="poky" remote="yocto" revision="9ee329c18fbe0c42eaf3d43657ea30591f79143b" path="sources/poky" />
+	<project name="poky" remote="yocto" revision="b0cb809fb9fe2828cf41ef1116952322c70a9e62" path="sources/poky" />
 	<project name="meta-openembedded" revision="6fd6cd72e236303fba94273f2a94a2c11c59d71e" path="sources/meta-openembedded" />
 	<project name="meta-homeassistant/meta-homeassistant.git" remote="github" revision="7de873c320fb20414738ad02ee45fc0e3e4a1e0b" path="sources/meta-homeassistant" />
 	<project name="meta-freertos" remote="aehs29" revision="5c1e1e53c2022b4e14b403ef6b66c90a2236e993" path="sources/meta-freertos" />
