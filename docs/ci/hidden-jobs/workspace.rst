@@ -78,7 +78,11 @@ repositories directly described by the manifest.
 When set to a non-empty value, the specified git repository will be first
 checked out by the git-repo according to what is described in the manifest, and
 then changed again, to point to ``$CI_COMMIT_SHA``. The logic in the script
-supports the forked repository workflow, adding any remotes as appropriate. 
+supports the forked repository workflow, by reusing the merge setup GitLab does
+on pipelines for merge results. See GitLab documentation on `Pipelines for
+Merge Results`_ for more information.
+
+.. _Pipelines for Merge Results: https://docs.gitlab.com/ee/ci/merge_request_pipelines/pipelines_for_merged_results/index.html
 
 The default value is the empty string.
 
