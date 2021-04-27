@@ -46,10 +46,10 @@
     - |
       if [ -n "$OHOS_CI_GIT_REPO_PATH" ]; then
         if [ -n "$CI_MERGE_REQUEST_SOURCE_PROJECT_URL" ]; then
-            echo "CI: Adding $CI_MERGE_REQUEST_SOURCE_PROJECT_URL as remote 'incoming'";
+            echo "CI: Bootstrapping '$CI_PROJECT_DIR' as 'incoming-merged' remote in '$OHOS_CI_GIT_REPO_PATH'";
             ( cd "$OHOS_CI_GIT_REPO_PATH" \
-                && git remote add incoming "$CI_MERGE_REQUEST_SOURCE_PROJECT_URL" \
-                && git fetch incoming "$CI_COMMIT_REF_NAME" );
+                && git remote add incoming-merged "$CI_PROJECT_DIR" \
+                && git fetch incoming-merged HEAD );
         fi;
         echo "CI: Switching $OHOS_CI_GIT_REPO_PATH to $CI_COMMIT_SHA";
         ( cd "$OHOS_CI_GIT_REPO_PATH" && git checkout "$CI_COMMIT_SHA" );
