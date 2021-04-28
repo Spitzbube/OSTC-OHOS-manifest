@@ -27,7 +27,7 @@
     - cd "$SCRATCH_DIR"
 
     - repo init --reference
-           /var/shared/pub/git-repo-mirrors/"$OSTC_MANIFEST_MIRROR"
+           /var/shared/pub/git-repo-mirrors/"$OHOS_MANIFEST_MIRROR"
            --manifest-url "$OHOS_MANIFEST_URL"
            --manifest-name "$OHOS_MANIFEST_NAME"
            --manifest-branch "$OHOS_MANIFEST_BRANCH"
