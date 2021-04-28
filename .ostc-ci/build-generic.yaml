@@ -147,7 +147,7 @@
     # in local.conf. The list of settings may grow over time.
     - |
       if [ "$OHOS_BUILD_CACHE" != private ]; then
-        if [ grep -qF 'ACCEPT_FSL_EULA = "1"' conf/local.conf ]; then
+        if grep -qF 'ACCEPT_FSL_EULA = "1"' conf/local.conf; then
           echo "cannot use OHOS_BUILD_CACHE=$OHOS_BUILD_CACHE with ACCEPT_FSL_EULA = \"1\""
           exit 1
         fi
