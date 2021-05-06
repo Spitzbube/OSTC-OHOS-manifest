@@ -1,0 +1,63 @@
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: Huawei Inc.
+
+.lava-test:
+  image:
+    name: registry.ostc-eu.org/ostc/containers/ostc-builder:latest
+  before_script:
+    # Check if the job is configured properly.
+    - test -n "$CI_LAVA_JOB_DEFINITION" || (
+        echo "precondition failed - set CI_LAVA_JOB_DEFINITION to the URL of the LAVA test job definition"
+        && exit 1 )
+    - test -n "$CI_BUILD_JOB_NAME" || (
+        echo "precondition failed - set CI_BUILD_JOB_NAME to the appropriate job name from which LAVA will pick up build artifact"
+        && exit 1 )
+    - test -n "$CI_REPORT_JOB_NAME" || (
+        echo "precondition failed - set CI_REPORT_JOB_NAME to the CI job name which will gather results back from LAVA"
+        && exit 1 )
+
+  script:
+    # Build callback URL for the "report" job
+    - curl --silent "https://git.ostc-eu.org/api/v4/projects/$CI_PROJECT_ID/pipelines/$CI_PIPELINE_ID/jobs" > jobs-manual.json
+    - job_id="$(jq -r ".[] | select(.name == \"$CI_REPORT_JOB_NAME\") | .id" jobs-manual.json)"
+    - build_job_id="$(jq -r ".[] | select(.name == \"$CI_BUILD_JOB_NAME\") | .id" jobs-manual.json)"
+    - CALLBACK_URL="https://git.ostc-eu.org/api/v4/projects/$CI_PROJECT_ID/jobs/${job_id}/play"
+    # Get the job definition from remote source.
+    - curl --silent "$CI_LAVA_JOB_DEFINITION" > job_def.yaml
+    # Update the job definition with CI data.
+    - sed -i -e 's/$ci_job_id/'"$CI_JOB_ID"'/'
+      -e 's/$ci_project_id/'"$CI_PROJECT_ID"'/'
+      -e 's/$ci_pipeline_id/'"$CI_PIPELINE_ID"'/'
+      -e 's/$build_job_id/'"$build_job_id"'/'
+      -e 's,$callback_url,'"$CALLBACK_URL"',' job_def.yaml
+    # Submit the job to LAVA.
+    - 'curl -X POST -H "Authorization: Token $CI_LAVA_TOKEN" -F "definition=$(<job_def.yaml)" "$CI_LAVA_INSTANCE/api/v0.2/jobs/" | jq ".job_ids" | tr -d "[]" | xargs >> job_ids.txt'
+  artifacts:
+    paths:
+      - job_ids.txt
+
+.lava-report:
+  image:
+    name: registry.ostc-eu.org/ostc/containers/ostc-builder:latest
+  stage: report
+  script:
+    - |
+      while read -r p; do
+        mkdir "$p"
+        # Get the archive links where the artifacts are stored from lava results.
+        # For some reason metadata field is a string and not a dict so we have to remove the trailing new lines from it with sed.
+        curl --silent "$CI_LAVA_INSTANCE/api/v0.2/jobs/$p/tests/?name=test-attachment" | jq -rjc ".results[].metadata" | sed "s/'/\n'\n/g" | grep "http*" | sed 's/http/https/g' >> result_urls.txt
+      done <job_ids.txt
+    - |
+      while read -r p; do
+        # Download resulting xmls.
+        curl --silent -O "$p"
+      done <result_urls.txt
+
+  artifacts:
+    when: always
+    paths:
+      - Acts*.xml
+    reports:
+      junit:
+        - Acts*.xml

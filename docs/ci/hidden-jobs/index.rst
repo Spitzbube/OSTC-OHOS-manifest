@@ -22,4 +22,6 @@ implementation details.
    build-recipe
    build-image
    build-docs
+   lava-test
+   lava-report
    aggregate-docs
