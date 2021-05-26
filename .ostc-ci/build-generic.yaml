@@ -33,10 +33,15 @@ include:
     - echo "$SCRATCH_DIR" > "$CI_PROJECT_DIR"/.scratch-dir-name
     - cd "$SCRATCH_DIR"
 
-    - repo init --reference
-           /var/shared/pub/git-repo-mirrors/"$OHOS_MANIFEST_MIRROR"
-           --manifest-url "$OHOS_MANIFEST_URL"
-           --manifest-name "$OHOS_MANIFEST_NAME"
+    - |
+        echo "Building repo workspace with the following properties:"
+        echo "OHOS_MANIFEST_URL: $OHOS_MANIFEST_URL"
+        echo "OHOS_MANIFEST_NAME: $OHOS_MANIFEST_NAME"
+        echo "OHOS_MANIFEST_BRANCH: $OHOS_MANIFEST_BRANCH"
+        repo init --reference \
+           /var/shared/pub/git-repo-mirrors/"$OHOS_MANIFEST_MIRROR" \
+           --manifest-url "$OHOS_MANIFEST_URL" \
+           --manifest-name "$OHOS_MANIFEST_NAME" \
            --manifest-branch "$OHOS_MANIFEST_BRANCH"
     - time repo sync --no-clone-bundle
 
