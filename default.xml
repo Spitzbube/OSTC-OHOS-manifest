@@ -44,7 +44,6 @@ SPDX-FileCopyrightText: Huawei Inc.
 	<project name="meta-freescale" remote="yocto" revision="11170950b155168ec414bbde48e3a4427fcac4bd" path="sources/meta-freescale" />
 	<project name="meta-seco-imx" remote="seco-imx" revision="c1cd8a485eb5888dc14e2f4e7d399d415f1ba8bb" path="sources/meta-seco-imx" />
 	<project name="meta-av96" revision="b8e6ed27285c6e86f89398a7029997652afb8002" path="sources/meta-av96" />
-	<project name="meta-zephyr" revision="c557ca0c5663b0b59e59fa0b30e1a5599f215daf" path="sources/meta-zephyr" />
 	<project name="meta-python-dunfellplus" revision="6363baa57b0b819bea0aefae968da167e4532e92" path="sources/meta-python-dunfellplus" />
 	<project name="meta-raspberrypi" remote="yocto" revision="77190af02d48adc2b28216775e6318e9eeda571c" path="sources/meta-raspberrypi" />
 
@@ -64,6 +63,7 @@ SPDX-FileCopyrightText: Huawei Inc.
 
 	<project name="meta-ohos" path="sources/meta-ohos" />
 	<project name="meta-clang" revision="main" path="sources/poky/meta-clang" />
+	<project name="meta-zephyr" revision="ostc/master" path="sources/meta-zephyr" />
 	<project name="docs" path="docs" revision="main" />
 	<project name="governance/ip-policy" revision="main" path="ip-policy" />
 </manifest>
