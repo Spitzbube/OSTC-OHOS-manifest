@@ -44,20 +44,14 @@
     - |
       while read -r p; do
         mkdir "$p"
-        # Get the archive links where the artifacts are stored from lava results.
-        # For some reason metadata field is a string and not a dict so we have to remove the trailing new lines from it with sed.
-        curl --silent "$CI_LAVA_INSTANCE/api/v0.2/jobs/$p/tests/?name=test-attachment" | jq -rjc ".results[].metadata" | sed "s/'/\n'\n/g" | grep "http*" | sed 's/http/https/g' >> result_urls.txt
+        # Get the JUnit export from LAVA.
+        curl --silent -o job_$p.xml "$CI_LAVA_INSTANCE/api/v0.2/jobs/$p/junit/"
       done <job_ids.txt
-    - |
-      while read -r p; do
-        # Download resulting xmls.
-        curl --silent -O "$p"
-      done <result_urls.txt
 
   artifacts:
     when: always
     paths:
-      - Acts*.xml
+      - job_*.xml
     reports:
       junit:
-        - Acts*.xml
+        - job_*.xml
