@@ -113,10 +113,10 @@ include:
         echo "precondition failed - cannot define just one of OHOS_CI_DEVTOOL_RECIPE_NAME and OHOS_CI_DEVTOOL_LAYER_PATH"
         exit 1
       fi
-    # Bitbake is configured to use /var/shared/bitbake directory
-    # for both the download directory and the sstate-cache.
-    - test -w /var/shared/bitbake || (
-        echo "precondition failed - expected /var/shared/bitbake to be writable"
+    # Bitbake is configured to use /var/shared/$OHOS_BUILD_CACHE/bitbake
+    # directory for both the download directory and the sstate-cache.
+    - test -w /var/shared/$OHOS_BUILD_CACHE/bitbake || (
+        echo "precondition failed - expected /var/shared/$OHOS_BUILD_CACHE/bitbake to be writable"
         && exit 1 )
     # Log available disk space on the persistent shared disk.
     - df -h /var/shared/bitbake
