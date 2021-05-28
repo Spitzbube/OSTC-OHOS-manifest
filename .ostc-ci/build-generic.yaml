@@ -198,10 +198,15 @@ include:
   extends: .bitbake-workspace
   variables:
     OHOS_BUILD_FLAVOUR: linux
+    # Linux builds can be extremely large. Use rm_work to remove the temporary
+    # build data as soon as possible to reclaim space.
+    OHOS_BB_LOCAL_CONF_plus_equals_INHERIT: "rm_work"
   script:
     - !reference [.bitbake-workspace, script]
     - time bitbake allscenarios-image-base-tests
+    - du -sh tmp
     - time bitbake allscenarios-image-extra-tests
+    - du -sh tmp
 
 # This job is documented in docs/ci/hidden-jobs/build-zephyr.rst
 .build-zephyr:
