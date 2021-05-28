@@ -28,14 +28,13 @@ reuse:
   extends: .reuse
 
 # Customize the .workspace job, included from build-generic.yaml above, with an
-# override for the OHOS_MANIFEST_BRANCH variable. When building, use the
-# manifest repository from the branch being proposed. This setting is only
-# valid in the manifest repository.
+# override for the OHOS_MANIFEST_BRANCH and OHOS_MANIFEST_URL variables.
+# When building, use the manifest repository from the fork and branch being
+# proposed. These settings are only valid in the manifest repository.
 .workspace:
   variables:
+    OHOS_MANIFEST_URL: "$CI_MERGE_REQUEST_SOURCE_PROJECT_URL"
     OHOS_MANIFEST_BRANCH: "$CI_COMMIT_REF_NAME"
-    # FIXME: also set OHOS_MANIFEST_URL to something that enables fork workflow
-
 # Customize the .bitbake-workspace job, included from build-generic.yaml above,
 # with an unique set of rules that enable the job
 .bitbake-workspace:
