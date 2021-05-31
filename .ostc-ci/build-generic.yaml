@@ -87,7 +87,7 @@ include:
 .bitbake-workspace:
   extends: .workspace
   stage: build
-  timeout: 3h
+  timeout: 6h
   variables:
     OHOS_BUILD_FLAVOUR: ""
     OHOS_BUILD_CACHE: "private"
