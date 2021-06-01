@@ -6,6 +6,7 @@ stages:
   - build
   - test
   - deploy
+  - report
 
 include:
  - project: 'OSTC/infrastructure/pipelines'
@@ -20,6 +21,8 @@ include:
  - local: '/.ostc-ci/build-flavours.yaml'
  # Include the set of jobs using the default manifest.
  - local: '/.ostc-ci/default-targets.yaml'
+ # Include the generic .spread and .lava jobs.
+ - local: '/.ostc-ci/test-generic.yaml'
 
 dco:
   extends: .dco
@@ -77,3 +80,22 @@ build-docs:
 aggregate-docs:
   extends: .aggregate-docs
   needs: [build-docs]
+
+##
+## Submit jobs to LAVA
+##
+lava-qemu-x86_64:
+  needs: [linux-qemu-x86_64]
+  stage: test
+  extends: .lava-test
+  variables:
+    CI_LAVA_JOB_DEFINITION: "https://git.ostc-eu.org/OSTC/infrastructure/lava/lava-config/-/raw/master/lava.ostc-eu.org/job-definitions/ci/qemu-x86_64-acts.yaml"
+    CI_BUILD_JOB_NAME: linux-qemu-x86_64
+    CI_REPORT_JOB_NAME: report
+
+##
+## Get the results back from LAVA.
+##
+report:
+  needs: [lava-qemu-x86_64]
+  extends: .lava-report

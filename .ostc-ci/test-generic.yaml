@@ -1,6 +1,9 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: Huawei Inc.
 
+##
+## Submits a job to LAVA with CI variables
+##
 .lava-test:
   image:
     name: registry.ostc-eu.org/ostc/containers/ostc-builder:latest
@@ -15,7 +18,6 @@
     - test -n "$CI_REPORT_JOB_NAME" || (
         echo "precondition failed - set CI_REPORT_JOB_NAME to the CI job name which will gather results back from LAVA"
         && exit 1 )
-
   script:
     # Build callback URL for the "report" job
     - curl --silent "https://git.ostc-eu.org/api/v4/projects/$CI_PROJECT_ID/pipelines/$CI_PIPELINE_ID/jobs" > jobs-manual.json
@@ -35,6 +37,16 @@
   artifacts:
     paths:
       - job_ids.txt
+  rules:
+    # Run the build when it is scheduled.
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+    # Do not run pipelines for draft merge requests unless manually triggered.
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TITLE =~ /^(wip|draft):.*/i'
+      when: manual
+    # Run the build when a merge request is created.
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    # Run the build when a tag is placed.
+    - if: '$CI_COMMIT_TAG'
 
 .lava-report:
   image:
@@ -47,7 +59,6 @@
         # Get the JUnit export from LAVA.
         curl --silent -o job_$p.xml "$CI_LAVA_INSTANCE/api/v0.2/jobs/$p/junit/"
       done <job_ids.txt
-
   artifacts:
     when: always
     paths:
@@ -55,3 +66,13 @@
     reports:
       junit:
         - job_*.xml
+  rules:
+    # Run the build when it is scheduled.
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+    # Do not run pipelines for draft merge requests unless manually triggered.
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TITLE =~ /^(wip|draft):.*/i'
+      when: manual
+    # Run the build when a merge request is created.
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    # Run the build when a tag is placed.
+    - if: '$CI_COMMIT_TAG'
