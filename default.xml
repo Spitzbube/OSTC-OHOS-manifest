@@ -23,6 +23,7 @@ SPDX-FileCopyrightText: Huawei Inc.
 	<remote name="seco-intel" fetch="https://git.seco.com/pub/intel/yocto" />
 	<remote name="seco-imx" fetch="https://git.seco.com/pub/i.mx/yocto/5.x" />
 	<remote name="stm" fetch="https://github.com/STMicroelectronics" />
+	<remote name="linaro" fetch="https://git.linaro.org/openembedded" />
 
 	<!--
 		All Scenario OS build system is based on Yocto "dunfell"
@@ -47,6 +48,7 @@ SPDX-FileCopyrightText: Huawei Inc.
 	<project name="meta-python-dunfellplus" revision="6363baa57b0b819bea0aefae968da167e4532e92" path="sources/meta-python-dunfellplus" />
 	<project name="meta-raspberrypi" remote="yocto" revision="77190af02d48adc2b28216775e6318e9eeda571c" path="sources/meta-raspberrypi" />
 	<project name="meta-security" remote="yocto" revision="93232ae6d52b0d1968aa0ce69fa745e85e3bbc6b" path="sources/meta-security" />
+	<project name="meta-linaro" remote="linaro" revision="10af9133aeb28b3487fd227c900c11b786505699" path="sources/meta-linaro" />
 
 	<!--
 		All entries above are pinned to a specific revision and updated manually.
