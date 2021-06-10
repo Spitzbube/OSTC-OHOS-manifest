@@ -27,14 +27,6 @@ dco:
 reuse:
   extends: .reuse
 
-# Customize the .workspace job, included from build-generic.yaml above, with an
-# override for the OHOS_MANIFEST_BRANCH and OHOS_MANIFEST_URL variables.
-# When building, use the manifest repository from the fork and branch being
-# proposed. These settings are only valid in the manifest repository.
-.workspace:
-  variables:
-    OHOS_MANIFEST_URL: "$CI_MERGE_REQUEST_SOURCE_PROJECT_URL"
-    OHOS_MANIFEST_BRANCH: "$CI_COMMIT_REF_NAME"
 # Customize the .bitbake-workspace job, included from build-generic.yaml above,
 # with an unique set of rules that enable the job
 .bitbake-workspace:
@@ -52,6 +44,13 @@ reuse:
         - $OHOS_MANIFEST_NAME
         - .gitlab-ci.yml
         - .ostc-ci/*.yaml
+      # When building a merge request substitute the OHOS_MANIFEST_URL to point
+      # to the incoming repository, and OHOS_MANIFEST_BRANCH, to the right
+      # branch name. This allows testing the changes coming into project. This
+      # is done here, so that it does not clobber scheduled pipelines.
+      variables:
+        OHOS_MANIFEST_URL: "$CI_MERGE_REQUEST_SOURCE_PROJECT_URL"
+        OHOS_MANIFEST_BRANCH: "$CI_COMMIT_REF_NAME"
     # Run the build when a tag is placed.
     - if: '$CI_COMMIT_TAG'
   artifacts:
