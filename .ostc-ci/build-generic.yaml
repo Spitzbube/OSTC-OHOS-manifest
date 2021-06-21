@@ -223,9 +223,16 @@ include:
   interruptible: true
   variables:
     OHOS_BUILD_FLAVOUR: zephyr
+    OHOS_BITBAKE_TARGETS: "zephyr-philosophers"
   script:
+    - test -n "$OHOS_BITBAKE_TARGETS" || (
+        echo "nothing to build - OHOS_BITBAKE_TARGETS is empty"
+        && exit 1 )
     - !reference [.bitbake-workspace, script]
-    - time bitbake zephyr-philosophers
+    - |
+      for target in $OHOS_BITBAKE_TARGETS; do
+        time bitbake "$target"
+      done
 
 # This job is documented in docs/ci/hidden-jobs/build-freertos.rst
 .build-freertos:
