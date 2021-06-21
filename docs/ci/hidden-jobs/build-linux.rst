@@ -7,10 +7,8 @@
 ============
 
 The ``.build-linux`` job extends the :doc:`bitbake-workspace` job. It sets
-``OHOS_BUILD_FLAVOUR`` to ``linux`` and builds two test images:
-
-- ``openharmony-image-base-tests``
-- ``openharmony-image-extra-tests``
+``OHOS_BUILD_FLAVOUR`` to ``linux`` and builds the bitbake targets (e.g.
+images) as defined by ``OHOS_BITBAKE_TARGETS`` (defaults included).
 
 The images are built one after another, allowing CI to fail quickly in case of
 any problems with the more fundamental image. The set of built images may
@@ -37,3 +35,7 @@ the purpose of the desired job.
     script:
       - !reference [.bitbake-workspace, script]
       - true # put your code here
+
+.. note::
+
+   ``OHOS_BITBAKE_TARGETS`` can be overwritten if defaults are not desired.
