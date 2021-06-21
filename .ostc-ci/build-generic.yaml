@@ -202,15 +202,20 @@ include:
   interruptible: true
   variables:
     OHOS_BUILD_FLAVOUR: linux
+    OHOS_BITBAKE_TARGETS: "allscenarios-image-base-tests allscenarios-image-extra-tests"
     # Linux builds can be extremely large. Use rm_work to remove the temporary
     # build data as soon as possible to reclaim space.
     OHOS_BB_LOCAL_CONF_plus_equals_INHERIT: "rm_work"
   script:
+    - test -n "$OHOS_BITBAKE_TARGETS" || (
+        echo "nothing to build - OHOS_BITBAKE_TARGETS is empty"
+        && exit 1 )
     - !reference [.bitbake-workspace, script]
-    - time bitbake allscenarios-image-base-tests
-    - du -sh tmp
-    - time bitbake allscenarios-image-extra-tests
-    - du -sh tmp
+    - |
+      for target in $OHOS_BITBAKE_TARGETS; do
+        time bitbake "$target"
+        du -sh tmp
+      done
 
 # This job is documented in docs/ci/hidden-jobs/build-zephyr.rst
 .build-zephyr:
