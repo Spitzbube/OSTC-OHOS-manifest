@@ -7,8 +7,8 @@
 =============
 
 The ``.build-zephyr`` job extends the :doc:`bitbake-workspace` job. It sets
-``OHOS_BUILD_FLAVOUR`` to ``zephyr`` and builds the ``zephyr-philosophers``
-test image.
+``OHOS_BUILD_FLAVOUR`` to ``zephyr`` and builds the bitbake targets (e.g.
+images) as defined by ``OHOS_BITBAKE_TARGETS`` (defaults included).
 
 Usage Guide
 ===========
