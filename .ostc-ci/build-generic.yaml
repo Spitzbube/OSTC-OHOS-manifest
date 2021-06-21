@@ -94,6 +94,7 @@ include:
     OHOS_BB_LOCAL_CONF_CONNECTIVITY_CHECK_URIS: "https://example.net/"
     OHOS_BB_LOCAL_CONF_DL_DIR: /var/shared/$OHOS_BUILD_CACHE/bitbake/downloads
     OHOS_BB_LOCAL_CONF_SSTATE_DIR: /var/shared/$OHOS_BUILD_CACHE/bitbake/sstate-cache
+    OHOS_BB_LOCAL_CONF_IMAGE_VERSION_SUFFIX: ""
     OHOS_CI_DEVTOOL_RECIPE_NAME: ""
     OHOS_CI_DEVTOOL_LAYER_PATH: ""
 
