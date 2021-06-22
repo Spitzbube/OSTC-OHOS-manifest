@@ -91,11 +91,20 @@ lava-qemu-x86_64:
   variables:
     CI_LAVA_JOB_DEFINITION: "https://git.ostc-eu.org/OSTC/infrastructure/lava/lava-config/-/raw/master/lava.ostc-eu.org/job-definitions/ci/qemu-x86_64-acts.yaml"
     CI_BUILD_JOB_NAME: linux-qemu-x86_64
-    CI_REPORT_JOB_NAME: report
+    CI_REPORT_JOB_NAME: lava-report
+
+lava-qemu-x86:
+  needs: [linux-qemu-x86]
+  stage: test
+  extends: .lava-test
+  variables:
+    CI_LAVA_JOB_DEFINITION: "https://git.ostc-eu.org/OSTC/infrastructure/lava/lava-config/-/raw/master/lava.ostc-eu.org/job-definitions/ci/qemu-x86-acts.yaml"
+    CI_BUILD_JOB_NAME: linux-qemu-x86
+    CI_REPORT_JOB_NAME: lava-report
 
 ##
 ## Get the results back from LAVA.
 ##
-report:
-  needs: [lava-qemu-x86_64]
+lava-report:
+  needs: [lava-qemu-x86_64, lava-qemu-x86]
   extends: .lava-report
