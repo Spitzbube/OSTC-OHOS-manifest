@@ -64,9 +64,9 @@ SPDX-FileCopyrightText: Huawei Inc.
 
 	-->
 
-	<project name="meta-ohos" path="sources/meta-ohos" revision="refs/tags/v1.0.0-alpha" />
-	<project name="meta-clang" revision="bf5a491eba4ca451e3361ab5731fe86235ce20ca" path="sources/poky/meta-clang" />
-	<project name="meta-zephyr" revision="afa739af065c416653f8105ab893704654d443b9" path="sources/meta-zephyr" />
-	<project name="docs" path="docs" revision="refs/tags/v1.0.0-alpha" />
-	<project name="governance/ip-policy" revision="refs/tags/v1.0.0-alpha" path="ip-policy" />
+	<project name="meta-ohos" path="sources/meta-ohos" />
+	<project name="meta-clang" revision="main" path="sources/poky/meta-clang" />
+	<project name="meta-zephyr" revision="ostc/master" path="sources/meta-zephyr" />
+	<project name="docs" path="docs" revision="main" />
+	<project name="governance/ip-policy" revision="main" path="ip-policy" />
 </manifest>
