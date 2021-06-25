@@ -102,9 +102,18 @@ lava-qemu-x86:
     CI_BUILD_JOB_NAME: linux-qemu-x86
     CI_REPORT_JOB_NAME: lava-report
 
+lava-zephyr-96b-nitrogen:
+  needs: [zephyr-96b-nitrogen]
+  stage: test
+  extends: .lava-test
+  variables:
+    CI_LAVA_JOB_DEFINITION: "https://git.ostc-eu.org/OSTC/infrastructure/lava/lava-config/-/raw/master/lava.ostc-eu.org/job-definitions/ci/nitrogen-boot.yaml"
+    CI_BUILD_JOB_NAME: zephyr-96b-nitrogen
+    CI_REPORT_JOB_NAME: lava-report
+
 ##
 ## Get the results back from LAVA.
 ##
 lava-report:
-  needs: [lava-qemu-x86_64, lava-qemu-x86]
+  needs: [lava-qemu-x86_64, lava-qemu-x86, zephyr-96b-nitrogen]
   extends: .lava-report
