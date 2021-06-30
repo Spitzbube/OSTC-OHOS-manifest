@@ -30,6 +30,7 @@
     - sed -i -e 's/$ci_job_id/'"$CI_JOB_ID"'/'
       -e 's/$ci_project_id/'"$CI_PROJECT_ID"'/'
       -e 's/$ci_pipeline_id/'"$CI_PIPELINE_ID"'/'
+      -e 's,$ci_pipeline_url,'"$CI_PIPELINE_URL"','
       -e 's/$build_job_id/'"$build_job_id"'/'
       -e 's,$callback_url,'"$CALLBACK_URL"',' job_def.yaml
     # Submit the job to LAVA.
