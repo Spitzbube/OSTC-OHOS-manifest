@@ -133,5 +133,5 @@ lava-zephyr-qemu-x86:
 ## Get the results back from LAVA.
 ##
 lava-report:
-  needs: [lava-qemu-x86_64, lava-qemu-x86, zephyr-96b-nitrogen, lava-zephyr-qemu-cortex-m3, lava-zephyr-qemu-x86]
+  needs: [lava-qemu-x86_64, lava-qemu-x86, lava-zephyr-96b-nitrogen, lava-zephyr-qemu-cortex-m3, lava-zephyr-qemu-x86]
   extends: .lava-report

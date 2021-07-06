@@ -33,10 +33,18 @@
       -e 's/$build_job_id/'"$build_job_id"'/'
       -e 's,$callback_url,'"$CALLBACK_URL"',' job_def.yaml
     # Submit the job to LAVA.
-    - 'curl -X POST -H "Authorization: Token $CI_LAVA_TOKEN" -F "definition=$(<job_def.yaml)" "$CI_LAVA_INSTANCE/api/v0.2/jobs/" | jq ".job_ids" | tr -d "[]" | xargs >> job_ids.txt'
+    - |
+      lava_job_id=$(curl -X POST -H "Authorization: Token $CI_LAVA_TOKEN" -F "definition=$(<job_def.yaml)" "$CI_LAVA_INSTANCE/api/v0.2/jobs/" | jq ".job_ids" | tr -d "[\n ]")
+      if [ -n "${lava_job_id}" ]; then
+        echo "$CI_LAVA_INSTANCE/scheduler/job/$lava_job_id"
+        echo "$lava_job_id" >> job_ids_"$CI_JOB_NAME".txt
+      else
+        echo "Failed to submit LAVA job"
+        exit 1
+      fi
   artifacts:
     paths:
-      - job_ids.txt
+      - job_ids_*.txt
   rules:
     # Run the build when it is scheduled.
     - if: $CI_PIPELINE_SOURCE == "schedule"
@@ -54,11 +62,16 @@
   stage: report
   script:
     - |
-      while read -r p; do
-        mkdir "$p"
-        # Get the JUnit export from LAVA.
-        curl --silent -o job_$p.xml "$CI_LAVA_INSTANCE/api/v0.2/jobs/$p/junit/"
-      done <job_ids.txt
+      for file in $(find ./ -name "job_ids_*.txt"); do
+        echo "Job file: $file"
+        while read -r p; do
+          echo "Job ID: $p"
+          mkdir "$p"
+          # Get the JUnit export from LAVA.
+          curl --silent -o job_$p.xml "$CI_LAVA_INSTANCE/api/v0.2/jobs/$p/junit/"
+          echo "Report file: $(ls job_$p.xml)"
+        done < "$file"
+      done
   artifacts:
     when: always
     paths:
