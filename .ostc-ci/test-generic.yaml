@@ -71,12 +71,18 @@
           # Echo LAVA job health and link.
           link="$CI_LAVA_INSTANCE/scheduler/job/$p"
           health="$(curl --silent "$CI_LAVA_INSTANCE/api/v0.2/jobs/$p/" | jq '.health' | tr -d '"')"
+          [ "$health" = "Incomplete" ] && lava_report_health="$health"
           echo "[$health] $link"
           # Get the JUnit export from LAVA.
           curl --silent -o job_$p.xml "$CI_LAVA_INSTANCE/api/v0.2/jobs/$p/junit/"
           echo "Report file: $(ls job_$p.xml)"
         done < "$file"
       done
+
+      if [ "$lava_report_health" = "Incomplete" ]; then
+        echo "ERROR: Incomplete LAVA job found, failing lava-report job..."
+        exit 1
+      fi
   artifacts:
     when: always
     paths:
