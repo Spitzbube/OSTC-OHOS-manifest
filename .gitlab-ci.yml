@@ -92,6 +92,8 @@ lava-qemu-x86_64:
     CI_LAVA_JOB_DEFINITION: "https://git.ostc-eu.org/OSTC/infrastructure/lava/lava-config/-/raw/master/lava.ostc-eu.org/job-definitions/ci/qemu-x86_64-acts.yaml"
     CI_BUILD_JOB_NAME: linux-qemu-x86_64
     CI_REPORT_JOB_NAME: lava-report
+  rules:
+    - when: never
 
 lava-qemu-x86:
   needs: [linux-qemu-x86]
@@ -101,6 +103,8 @@ lava-qemu-x86:
     CI_LAVA_JOB_DEFINITION: "https://git.ostc-eu.org/OSTC/infrastructure/lava/lava-config/-/raw/master/lava.ostc-eu.org/job-definitions/ci/qemu-x86-acts.yaml"
     CI_BUILD_JOB_NAME: linux-qemu-x86
     CI_REPORT_JOB_NAME: lava-report
+  rules:
+    - when: never
 
 lava-zephyr-96b-nitrogen:
   needs: [zephyr-96b-nitrogen]
@@ -110,6 +114,8 @@ lava-zephyr-96b-nitrogen:
     CI_LAVA_JOB_DEFINITION: "https://git.ostc-eu.org/OSTC/infrastructure/lava/lava-config/-/raw/master/lava.ostc-eu.org/job-definitions/ci/nitrogen-boot.yaml"
     CI_BUILD_JOB_NAME: zephyr-96b-nitrogen
     CI_REPORT_JOB_NAME: lava-report
+  rules:
+    - when: never
 
 lava-zephyr-qemu-cortex-m3:
   needs: [zephyr-qemu-cortex-m3]
@@ -119,6 +125,8 @@ lava-zephyr-qemu-cortex-m3:
     CI_LAVA_JOB_DEFINITION: "https://git.ostc-eu.org/OSTC/infrastructure/lava/lava-config/-/raw/master/lava.ostc-eu.org/job-definitions/ci/qemu-zephyr-cortex-m3.yaml"
     CI_BUILD_JOB_NAME: zephyr-qemu-cortex-m3
     CI_REPORT_JOB_NAME: lava-report
+  rules:
+    - when: never
 
 lava-zephyr-qemu-x86:
   needs: [zephyr-qemu-x86]
@@ -128,6 +136,8 @@ lava-zephyr-qemu-x86:
     CI_LAVA_JOB_DEFINITION: "https://git.ostc-eu.org/OSTC/infrastructure/lava/lava-config/-/raw/master/lava.ostc-eu.org/job-definitions/ci/qemu-zephyr-x86.yaml"
     CI_BUILD_JOB_NAME: zephyr-qemu-x86
     CI_REPORT_JOB_NAME: lava-report
+  rules:
+    - when: never
 
 ##
 ## Get the results back from LAVA.
@@ -135,3 +145,5 @@ lava-zephyr-qemu-x86:
 lava-report:
   needs: [lava-qemu-x86_64, lava-qemu-x86, lava-zephyr-96b-nitrogen, lava-zephyr-qemu-cortex-m3, lava-zephyr-qemu-x86]
   extends: .lava-report
+  rules:
+    - when: never
