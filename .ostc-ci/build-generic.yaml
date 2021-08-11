@@ -95,6 +95,7 @@ include:
     OHOS_BB_LOCAL_CONF_DL_DIR: /var/shared/$OHOS_BUILD_CACHE/bitbake/downloads
     OHOS_BB_LOCAL_CONF_SSTATE_DIR: /var/shared/$OHOS_BUILD_CACHE/bitbake/sstate-cache
     OHOS_BB_LOCAL_CONF_IMAGE_VERSION_SUFFIX: ""
+    OHOS_BB_LOCAL_CONF_plus_equals_INHERIT: cve-check
     OHOS_CI_DEVTOOL_RECIPE_NAME: ""
     OHOS_CI_DEVTOOL_LAYER_PATH: ""
 
