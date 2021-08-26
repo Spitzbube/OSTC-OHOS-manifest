@@ -49,6 +49,7 @@ SPDX-FileCopyrightText: Huawei Inc.
 	<project name="meta-raspberrypi" remote="yocto" revision="77190af02d48adc2b28216775e6318e9eeda571c" path="sources/meta-raspberrypi" />
 	<project name="meta-security" remote="yocto" revision="93232ae6d52b0d1968aa0ce69fa745e85e3bbc6b" path="sources/meta-security" />
 	<project name="meta-linaro" remote="linaro" revision="10af9133aeb28b3487fd227c900c11b786505699" path="sources/meta-linaro" />
+	<project name="rauc/meta-rauc.git" remote="github" revision="f528f95b75922eb81895d764836a67f13858365a" path="sources/meta-rauc" />
 
 	<!--
 		All entries above are pinned to a specific revision and updated manually.
