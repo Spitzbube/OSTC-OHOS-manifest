@@ -10,6 +10,7 @@ include:
 
 # This job is documented in docs/ci/hidden-jobs/workspace.rst
 .workspace:
+  interruptible: true
   image:
     name: registry.ostc-eu.org/ostc/containers/ostc-builder:latest
   tags: [large-disk]
@@ -200,7 +201,6 @@ include:
 # This job is documented in docs/ci/hidden-jobs/build-linux.rst
 .build-linux:
   extends: .bitbake-workspace
-  interruptible: true
   variables:
     OHOS_BUILD_FLAVOUR: linux
     OHOS_BITBAKE_TARGETS: "allscenarios-image-base-tests allscenarios-image-extra-tests"
@@ -221,7 +221,6 @@ include:
 # This job is documented in docs/ci/hidden-jobs/build-zephyr.rst
 .build-zephyr:
   extends: .bitbake-workspace
-  interruptible: true
   variables:
     OHOS_BUILD_FLAVOUR: zephyr
     OHOS_BITBAKE_TARGETS: "zephyr-philosophers"
@@ -238,7 +237,6 @@ include:
 # This job is documented in docs/ci/hidden-jobs/build-freertos.rst
 .build-freertos:
   extends: .bitbake-workspace
-  interruptible: true
   variables:
     OHOS_BUILD_FLAVOUR: freertos
   script:
@@ -248,7 +246,6 @@ include:
 # This job is documented in docs/ci/hidden-jobs/build-recipe.rst
 .build-recipe:
   extends: .bitbake-workspace
-  interruptible: true
   variables:
     OHOS_RECIPE_NAME: ""
   script:
@@ -258,7 +255,6 @@ include:
 # This job is documented in docs/ci/hidden-jobs/build-image.rst
 .build-image:
   extends: .build-recipe
-  interruptible: true
   script:
     - !reference [.build-recipe, script]
     # Move artifacts for recovery, which only considers $CI_PROJECT_DIR and
