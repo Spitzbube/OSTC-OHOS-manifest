@@ -277,6 +277,7 @@ include:
 
 # This job is documented in docs/ci/hidden-jobs/build-docs.rst
 .build-docs:
+  interruptible: true
   image:
     name: registry.ostc-eu.org/ostc/containers/ostc-docs-builder
   stage: build

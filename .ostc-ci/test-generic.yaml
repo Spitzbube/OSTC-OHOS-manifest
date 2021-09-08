@@ -5,6 +5,7 @@
 ## Submits a job to LAVA with CI variables
 ##
 .lava-test:
+  interruptible: true
   image:
     name: registry.ostc-eu.org/ostc/containers/ostc-builder:latest
   before_script:
@@ -58,6 +59,7 @@
     - if: '$CI_COMMIT_TAG'
 
 .lava-report:
+  interruptible: true
   image:
     name: registry.ostc-eu.org/ostc/containers/ostc-builder:latest
   stage: report
