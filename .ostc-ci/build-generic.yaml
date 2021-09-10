@@ -122,7 +122,7 @@ include:
         echo "precondition failed - expected /var/shared/$OHOS_BUILD_CACHE/bitbake to be writable"
         && exit 1 )
     # Log available disk space on the persistent shared disk.
-    - df -h /var/shared/bitbake
+    - df -h /var/shared/$OHOS_BUILD_CACHE/bitbake
     - !reference [.workspace, before_script]
 
   script:
