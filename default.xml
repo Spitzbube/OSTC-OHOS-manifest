@@ -44,8 +44,8 @@ SPDX-FileCopyrightText: Huawei Inc.
 
 	<project name="meta-freescale" remote="yocto" revision="11170950b155168ec414bbde48e3a4427fcac4bd" path="sources/meta-freescale" />
 	<project name="meta-seco-imx" remote="seco-imx" revision="b53f14e87f6de91933457095a0e04676690a9cdc" path="sources/meta-seco-imx" />
-	<project name="meta-av96" revision="a4b2b45efcbad1882227eac54b5023ff6b736b10" path="sources/meta-av96" />
-	<project name="meta-python-dunfellplus" revision="bdb239904aab04c58a3c7fbfb2d1198bcbdf88cc" path="sources/meta-python-dunfellplus" />
+	<project name="meta-av96" revision="refs/tags/v1.0.0-beta" path="sources/meta-av96" />
+	<project name="meta-python-dunfellplus" revision="refs/tags/v1.0.0-beta" path="sources/meta-python-dunfellplus" />
 	<project name="meta-raspberrypi" remote="yocto" revision="77190af02d48adc2b28216775e6318e9eeda571c" path="sources/meta-raspberrypi" />
 	<project name="meta-security" remote="yocto" revision="93232ae6d52b0d1968aa0ce69fa745e85e3bbc6b" path="sources/meta-security" />
 	<project name="meta-linaro" remote="linaro" revision="10af9133aeb28b3487fd227c900c11b786505699" path="sources/meta-linaro" />
@@ -65,10 +65,10 @@ SPDX-FileCopyrightText: Huawei Inc.
 
 	-->
 
-	<project name="meta-ohos" path="sources/meta-ohos" />
-	<project name="meta-clang" revision="main" path="sources/poky/meta-clang" />
-	<project name="meta-riscv" revision="OSTC/dunfell" path="sources/meta-riscv" />
-	<project name="meta-zephyr" revision="ostc/master" path="sources/meta-zephyr" />
-	<project name="docs" path="docs" revision="main" />
-	<project name="governance/ip-policy" revision="main" path="ip-policy" />
+	<project name="meta-ohos" path="sources/meta-ohos" revision="refs/tags/v1.0.0-beta" />
+	<project name="meta-clang" revision="refs/tags/v1.0.0-beta" path="sources/poky/meta-clang" />
+	<project name="meta-riscv" revision="refs/tags/v1.0.0-beta" path="sources/meta-riscv" />
+	<project name="meta-zephyr" revision="refs/tags/v1.0.0-beta" path="sources/meta-zephyr" />
+	<project name="docs" path="docs" revision="refs/tags/v1.0.0-beta" />
+	<project name="governance/ip-policy" revision="refs/tags/v1.0.0-beta" path="ip-policy" />
 </manifest>
